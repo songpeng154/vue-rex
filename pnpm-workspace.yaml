@@ -4,3 +4,5 @@ allowBuilds:
   '@parcel/watcher': false
   esbuild: true
   simple-git-hooks: true
+minimumReleaseAgeExclude:
+  - vue-rex@1.1.20

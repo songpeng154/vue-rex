@@ -1,31 +1,31 @@
 {
   "name": "vue-rex-doc",
-  "private": true,
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview"
   },
   "dependencies": {
-    "vue-rex": "latest",
-    "@vueuse/core": "^13.1.0"
+    "@vueuse/core": "^13.9.0",
+    "vue-rex": "1.1.20"
   },
   "devDependencies": {
-    "vitepress": "^1.6.4",
-    "unocss": "^66.6.8",
-    "@unocss/eslint-plugin": "^66.6.8",
-    "@unocss/preset-icons": "^66.6.8",
-    "@shikijs/markdown-it": "^4.0.2",
-    "markdown-it": "^14.1.1",
+    "@iconify/json": "^2.2.503",
+    "@shikijs/markdown-it": "^4.3.1",
+    "@types/markdown-it": "^14.1.2",
+    "@unocss/eslint-plugin": "^66.7.5",
+    "@unocss/preset-icons": "^66.7.5",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "markdown-it": "^14.3.0",
     "markdown-it-container": "^4.0.0",
     "naive-ui": "^2.44.1",
-    "sass-embedded": "^1.99.0",
-    "shiki": "^4.0.2",
-    "@iconify/json": "^2.2.468",
-    "@vitejs/plugin-vue": "^6.0.6",
-    "vite-plugin-fake-server": "^2.2.3",
+    "sass-embedded": "^1.100.0",
+    "shiki": "^4.3.1",
+    "unocss": "^66.7.5",
+    "vite-plugin-fake-server": "^2.2.4",
     "vite-plugin-mock": "^3.0.2",
-    "@types/markdown-it": "^14.1.2"
+    "vitepress": "^1.6.4"
   }
 }
