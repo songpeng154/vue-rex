@@ -124,14 +124,14 @@ describe('createPagination', () => {
     })
   })
 
-  describe('paginationSerializer', () => {
+  describe('paginationFields', () => {
     it('在 create 时配置，自动注入分页参数', async () => {
       let capturedParams: any = null
 
       const usePage = createPagination({
         listKey: 'list',
         totalKey: 'total',
-        paginationSerializer: (page, pageSize) => ({ current: page, size: pageSize }),
+        paginationFields: { page: 'current', pageSize: 'size' },
       })
 
       const service = async (params: { current: number, size: number }) => {
@@ -147,37 +147,6 @@ describe('createPagination', () => {
       page.value = 2
       await asyncAwait(100)
       expect(capturedParams).toEqual({ current: 2, size: 10 })
-    })
-
-    it('offset/limit 风格', async () => {
-      let capturedParams: any = null
-
-      const usePage = createPagination({
-        listKey: 'list',
-        totalKey: 'total',
-        paginationSerializer: (page, pageSize) => ({
-          offset: (page - 1) * pageSize,
-          limit: pageSize,
-        }),
-      })
-
-      const service = async (params: { offset: number, limit: number }) => {
-        capturedParams = params
-        return { list: [] as UserItem[], total: 0 }
-      }
-
-      const [{ page, pageSize, run }] = withSetup(() => usePage(service))
-      run({ offset: 0, limit: 10 })
-      await asyncAwait(100)
-      expect(capturedParams).toEqual({ offset: 0, limit: 10 })
-
-      page.value = 3
-      await asyncAwait(100)
-      expect(capturedParams).toEqual({ offset: 20, limit: 10 })
-
-      pageSize.value = 20
-      await asyncAwait(100)
-      expect(capturedParams).toEqual({ offset: 0, limit: 20 })
     })
   })
 
@@ -413,13 +382,13 @@ describe('createPagination', () => {
   })
 
   describe('组合配置', () => {
-    it('listKey + totalKey + paginationSerializer 同时生效', async () => {
+    it('listKey + totalKey + paginationFields 同时生效', async () => {
       let capturedParams: any = null
 
       const usePage = createPagination({
         listKey: 'data.records',
         totalKey: 'data.count',
-        paginationSerializer: (page, pageSize) => ({ current: page, size: pageSize }),
+        paginationFields: { page: 'current', pageSize: 'size' },
       })
 
       const service = async (params: { current: number, size: number }) => {

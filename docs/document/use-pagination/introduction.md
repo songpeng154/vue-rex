@@ -31,13 +31,88 @@ const { list, total, page, pageSize, totalPage, isLastPage, reset } = usePage(ge
 use-pagination/base
 :::
 
+## 自定义分页字段
+
+后端分页字段名不是 `page` / `pageSize` 时，通过 `paginationFields` 映射：
+
+```typescript
+const usePage = createPagination({
+  listKey: 'data.list',
+  totalKey: 'data.total',
+  paginationFields: { page: 'current', pageSize: 'size' },
+})
+
+// service 收到的 params 里是 current / size
+const getUsers = (params: { current: number; size: number }) =>
+  server.get('/api/users', { params })
+```
+
+::: demo
+use-pagination/pagination-fields
+:::
+
+## 搜索 + 分页
+
+搜索时重置到第一页并推入新条件：`page.value = 1` + `run(params)`。
+
+```typescript
+const searchParams = ref({ page: 1, pageSize: 10, keyword: '' })
+
+const { list, page, run } = usePage(getUsers, {
+  defaultParams: searchParams.value,
+})
+
+const onSearch = () => {
+  page.value = 1
+  run({ ...searchParams.value, page: 1 })
+}
+```
+
+::: demo
+use-pagination/search-with-pagination
+:::
+
+## formatList
+
+对列表项做二次处理（字段重命名、格式化等），`total` 不受影响：
+
+```typescript
+const { list } = usePage(getUsers, {
+  formatList: (list) =>
+    list.map(item => ({
+      ...item,
+      fullName: `${item.lastName}${item.firstName}`,
+    })),
+})
+```
+
+::: demo
+use-pagination/format-list
+:::
+
+## 加载更多
+
+设置 `addedMode: true`，翻页时追加数据而非替换：
+
+::: demo
+use-pagination/added-mode
+:::
+
+## 滚动加载
+
+配合 `target` 指定滚动容器，滚动到底部自动加载下一页：
+
+::: demo
+use-pagination/target
+:::
+
 ## 配置
 
 | 配置项 | 类型 | 说明 |
 |:---|:---|:---|
 | `listKey` | `string` | 列表字段路径，支持点号 `data.records` |
 | `totalKey` | `string` | 总条数字段路径，支持点号 |
-| `paginationSerializer` | `(page, pageSize) => object` | 将 page/pageSize 映射为后端参数名，如 `{ current: page, size: pageSize }` |
+| `paginationFields` | `{ page: string, pageSize: string }` | 将 page/pageSize 映射为后端参数名，如 `{ page: 'current', pageSize: 'size' }` |
 | `options` | `object` | 全局默认配置，被调用时局部 options 覆盖 |
 
 ## Options

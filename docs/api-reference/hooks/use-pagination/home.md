@@ -44,14 +44,15 @@ interface CreatePaginationConfig<
   totalKey: TTotalKey
 
   /**
-   * 分页参数序列化方式
+   * 分页字段映射，将内部 page / pageSize 映射为后端实际的参数名
+   * @default { page: 'page', pageSize: 'pageSize' }
    * @example
-   * paginationSerializer: (page, size) => ({ current: page, size })
+   * paginationFields: { page: 'current', pageSize: 'size' }
    */
-  paginationSerializer?: (page: number, pageSize: number) => Record<string, any>
+  paginationFields?: PaginationFields
 
   /** 全局默认配置，会被调用时的 options 覆盖 */
-  options?: Omit<PaginationOptions, 'dataSerializer'>
+  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationFields' | 'errorSerializer'>
 }
 ```
 
@@ -79,7 +80,7 @@ import { createPagination } from 'norm-fetch/vue-rex'
 const usePage = createPagination({
   listKey: 'data.list',
   totalKey: 'data.total',
-  paginationSerializer: (page, size) => ({ page, size })
+  paginationFields: { page: 'page', pageSize: 'size' }
 })
 
 const { list, total, page, pageSize, loading, run } = usePage(

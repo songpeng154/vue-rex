@@ -48,8 +48,8 @@ export interface PaginationOptions<
   /** 默认参数，直接传对象即可 */
   defaultParams?: TParams
 
-  /** 分页参数序列化，用于适配后端不同的字段名 */
-  paginationSerializer?: (page: number, pageSize: number) => Partial<TParams>
+  /** 分页字段映射，用于适配后端不同的字段名 @default { page: 'page', pageSize: 'pageSize' } */
+  paginationFields?: PaginationFields
 
   /** 从 server 返回数据中提取 list 和 total */
   dataSerializer: (data: TData, params: TParams) => PaginationData<TItem>
@@ -130,11 +130,12 @@ pageSize 变化时是否重置 page
 
 默认参数，直接传对象即可
 
-### paginationSerializer
+### paginationFields
 
-* `可选` - `(page: number, pageSize: number) => Partial<TParams>`
+* `可选` - `PaginationFields`
+* 默认值：`{ page: 'page', pageSize: 'pageSize' }`
 
-分页参数序列化，用于适配后端不同的字段名
+分页字段映射，用于适配后端不同的字段名
 
 ### dataSerializer
 

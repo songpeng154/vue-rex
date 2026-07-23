@@ -252,7 +252,7 @@ describe('usePagination params 类型', () => {
     expect(capturedParams).toEqual({ page: 2, pageSize: 20 })
   })
 
-  it('defaultParams 与 paginationSerializer 同时使用', async () => {
+  it('defaultParams 与 paginationFields 同时使用', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { current: number, size: number }) => {
@@ -263,7 +263,7 @@ describe('usePagination params 类型', () => {
     const [{ run }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
-        paginationSerializer: (page, pageSize) => ({ current: page, size: pageSize }),
+        paginationFields: { page: 'current', pageSize: 'size' },
         defaultParams: { current: 1, size: 10 },
       }),
     )
@@ -298,7 +298,7 @@ describe('usePagination params 类型', () => {
     expect(capturedParams).toEqual({ page: 1, pageSize: 10, keyword: 'test' })
   })
 
-  it('翻页时 paginationSerializer 自动注入分页参数', async () => {
+  it('翻页时 paginationFields 自动注入分页参数', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword: string }) => {

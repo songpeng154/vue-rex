@@ -4,6 +4,20 @@ import type { Undefinable } from '../../types/utils.ts'
 import type { RequestOptions, RequestResult } from '../request/types.ts'
 
 /**
+ * 分页字段映射
+ * 将内部的 page / pageSize 概念映射为后端实际的参数名
+ * @example
+ * // 默认（后端字段名就是 page / pageSize）
+ * { page: 'page', pageSize: 'pageSize' }
+ * // 自定义（后端用 current / size）
+ * { page: 'current', pageSize: 'size' }
+ */
+export interface PaginationFields {
+  page: string
+  pageSize: string
+}
+
+/**
  * 分页数据标准结构
  */
 export interface PaginationData<TItem = any> {
@@ -45,8 +59,8 @@ export interface PaginationOptions<
   /** 默认参数，直接传对象即可 */
   defaultParams?: TParams
 
-  /** 分页参数序列化，用于适配后端不同的字段名 */
-  paginationSerializer?: (page: number, pageSize: number) => Partial<TParams>
+  /** 分页字段映射，用于适配后端不同的字段名 @default { page: 'page', pageSize: 'pageSize' } */
+  paginationFields?: PaginationFields
 
   /** 从 server 返回数据中提取 list 和 total */
   dataSerializer: (data: TData, params: TParams) => PaginationData<TItem>

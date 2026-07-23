@@ -16,7 +16,7 @@ export function usePagination<
   const {
     dataSerializer,
     formatList,
-    paginationSerializer = (page, pageSize) => ({ page, pageSize } as unknown as Partial<TParams>),
+    paginationFields = { page: 'page', pageSize: 'pageSize' },
     initialPage = 1,
     initialPageSize = 10,
     pageWatch = true,
@@ -36,15 +36,21 @@ export function usePagination<
   const pageSize = ref(initialPageSize)
 
   // ─── 构建默认参数 ─────────────────────────────────────────
-  const paginationDefaults = paginationSerializer(page.value, pageSize.value)
+  const paginationDefaults = {
+    [paginationFields.page]: page.value,
+    [paginationFields.pageSize]: pageSize.value,
+  } as Partial<TParams>
   const effectiveDefaultParams = defaultParams
     ? { ...defaultParams, ...paginationDefaults }
     : paginationDefaults as TParams
 
   // ─── 包装 service，注入分页参数 ───────────────────────────
   const wrappedService = (params: TParams) => {
-    const paginationArg = paginationSerializer(page.value, pageSize.value)
-    const mergedArg = { ...params, ...paginationArg }
+    const mergedArg = {
+      ...params,
+      [paginationFields.page]: page.value,
+      [paginationFields.pageSize]: pageSize.value,
+    }
     return service(mergedArg)
   }
 

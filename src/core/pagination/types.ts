@@ -1,4 +1,4 @@
-import type { PaginationOptions } from '../../hooks'
+import type { PaginationFields, PaginationOptions } from '../../hooks'
 
 export interface CreatePaginationConfig<
   TListKey extends string = string,
@@ -17,11 +17,12 @@ export interface CreatePaginationConfig<
   totalKey: TTotalKey
 
   /**
-   * 分页参数序列化方式
+   * 分页字段映射，将内部 page / pageSize 映射为后端实际的参数名
+   * @default { page: 'page', pageSize: 'pageSize' }
    * @example
-   * paginationSerializer: (page, size) => ({ current: page, size })
+   * paginationFields: { page: 'current', pageSize: 'size' }
    */
-  paginationSerializer?: (page: number, pageSize: number) => Record<string, any>
+  paginationFields?: PaginationFields
 
   /**
    * 将捕获到的原始错误转换为自定义错误类型，作用于所有通过此工厂创建的请求
@@ -38,5 +39,5 @@ export interface CreatePaginationConfig<
   /**
    * 全局默认配置，会被调用时的 options 覆盖
    */
-  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationSerializer' | 'errorSerializer'>
+  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationFields' | 'errorSerializer'>
 }

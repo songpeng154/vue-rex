@@ -31,13 +31,88 @@ Change `page` or `pageSize` to auto-trigger a request; call `reset()` to return 
 use-pagination/base
 :::
 
+## Custom Pagination Fields
+
+When the backend uses different field names, map them with `paginationFields`:
+
+```typescript
+const usePage = createPagination({
+  listKey: 'data.list',
+  totalKey: 'data.total',
+  paginationFields: { page: 'current', pageSize: 'size' },
+})
+
+// service receives current / size instead of page / pageSize
+const getUsers = (params: { current: number; size: number }) =>
+  server.get('/api/users', { params })
+```
+
+::: demo
+use-pagination/pagination-fields
+:::
+
+## Search + Pagination
+
+Reset to page 1 and push new conditions on search: `page.value = 1` + `run(params)`.
+
+```typescript
+const searchParams = ref({ page: 1, pageSize: 10, keyword: '' })
+
+const { list, page, run } = usePage(getUsers, {
+  defaultParams: searchParams.value,
+})
+
+const onSearch = () => {
+  page.value = 1
+  run({ ...searchParams.value, page: 1 })
+}
+```
+
+::: demo
+use-pagination/search-with-pagination
+:::
+
+## formatList
+
+Transform list items (rename fields, format values, etc.) while `total` stays unchanged:
+
+```typescript
+const { list } = usePage(getUsers, {
+  formatList: (list) =>
+    list.map(item => ({
+      ...item,
+      fullName: `${item.lastName}${item.firstName}`,
+    })),
+})
+```
+
+::: demo
+use-pagination/format-list
+:::
+
+## Load More
+
+Set `addedMode: true` to append data on page change instead of replacing:
+
+::: demo
+use-pagination/added-mode
+:::
+
+## Scroll Loading
+
+Use `target` to specify a scroll container; automatically loads the next page when scrolled to the bottom:
+
+::: demo
+use-pagination/target
+:::
+
 ## Configuration
 
 | Config | Type | Description |
 |:---|:---|:---|
 | `listKey` | `string` | List field path, supports dot notation `data.records` |
 | `totalKey` | `string` | Total count field path, supports dot notation |
-| `paginationSerializer` | `(page, pageSize) => object` | Map page/pageSize to backend param names, e.g. `{ current: page, size: pageSize }` |
+| `paginationFields` | `{ page: string, pageSize: string }` | Map page/pageSize to backend param names, e.g. `{ page: 'current', pageSize: 'size' }` |
 | `options` | `object` | Global defaults, overridden by local options |
 
 ## Options

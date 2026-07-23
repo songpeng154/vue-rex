@@ -24,15 +24,15 @@ import { usePagination } from '../../hooks'
  *   totalKey: 'data.total',
  * })
  *
- * // 配置错误类型
+ * // 配置错误类型（泛型自动推导，无需显式传入）
  * interface ApiError {
  *   code: number
  *   message: string
  * }
- * export const usePage = createPagination<'data.list', 'data.total', ApiError>({
+ * export const usePage = createPagination({
  *   listKey: 'data.list',
  *   totalKey: 'data.total',
- *   errorSerializer: (e) => ({
+ *   errorSerializer: (e): ApiError => ({
  *     code: e?.response?.status ?? -1,
  *     message: e?.message ?? String(e),
  *   })
@@ -57,7 +57,7 @@ export function createPagination<
     TFormatData = TItem,
   >(
     service: RequestServiceFn<TData, [TParams]>,
-    options?: Omit<PaginationOptions<TData, TParams, TItem, TFormatData, TError>, 'dataSerializer' | 'errorSerializer'>,
+    options?: Omit<PaginationOptions<TData, TParams, TItem, TFormatData, TError>, 'dataSerializer' | 'paginationFields' | 'errorSerializer'>,
   ): PaginationResult<TData, TParams, TItem, TFormatData, TError> {
     const _options = {
       ...config.options,
@@ -66,7 +66,7 @@ export function createPagination<
         list: get(data, listKey) ?? [],
         total: get(data, totalKey) ?? 0,
       }),
-      paginationSerializer: config.paginationSerializer,
+      paginationFields: config.paginationFields,
     } as PaginationOptions<TData, TParams, TItem, TFormatData, TError>
 
     if (config.errorSerializer && !_options.errorSerializer)
