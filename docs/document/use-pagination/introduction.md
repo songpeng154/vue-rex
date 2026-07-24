@@ -22,10 +22,10 @@ interface User { id: number; name: string }
 const getUsers = (params: { page: number; pageSize: number }) =>
   server.get<{ data: { list: User[]; total: number } }>('/api/users', { params })
 
-const { list, total, page, pageSize, totalPage, isLastPage, reset } = usePage(getUsers)
+const { list, total, page, pageSize, totalPage, isLastPage } = usePage(getUsers)
 ```
 
-修改 `page` 或 `pageSize` 自动触发请求；调用 `reset()` 回到第一页。
+修改 `page` 或 `pageSize` 自动触发请求。
 
 ::: demo
 use-pagination/base
@@ -53,20 +53,23 @@ use-pagination/pagination-fields
 
 ## 搜索 + 分页
 
-搜索时重置到第一页并推入新条件：`page.value = 1` + `run(params)`。
+传入 `params` ref 作为表单模型，`search()` 提交搜索条件并自动回到第一页：
 
 ```typescript
 const searchParams = ref({ page: 1, pageSize: 10, keyword: '' })
 
-const { list, page, run } = usePage(getUsers, {
-  defaultParams: searchParams.value,
+const { list, page, search } = usePage(getUsers, {
+  params: searchParams,
 })
 
-const onSearch = () => {
-  page.value = 1
-  run({ ...searchParams.value, page: 1 })
-}
+// 搜索：提交表单当前值 + page 归 1 + 发请求
+const onSearch = () => search()
+
+// 也可以显式传参（会写入表单 ref 再提交）
+search({ keyword: 'abc' })
 ```
+
+翻页时使用的是上次 `search()` 提交的搜索条件，表单中未提交的改动不会影响分页请求。
 
 ::: demo
 use-pagination/search-with-pagination
@@ -90,22 +93,6 @@ const { list } = usePage(getUsers, {
 use-pagination/format-list
 :::
 
-## 加载更多
-
-设置 `addedMode: true`，翻页时追加数据而非替换：
-
-::: demo
-use-pagination/added-mode
-:::
-
-## 滚动加载
-
-配合 `target` 指定滚动容器，滚动到底部自动加载下一页：
-
-::: demo
-use-pagination/target
-:::
-
 ## 配置
 
 | 配置项 | 类型 | 说明 |
@@ -121,10 +108,11 @@ use-pagination/target
 
 | 选项 | 类型 | 默认值 | 说明 |
 |:---|:---|:---|:---|
-| `initialPage` | `number` | `1` | 初始页码 |
-| `initialPageSize` | `number` | `10` | 初始每页条数 |
-| `pageWatch` | `boolean` | `true` | page 变化时是否自动请求 |
+| `params` | `Ref<TParams>` | - | 表单参数 ref，page/pageSize 会建立 computed 代理 |
+| `initialPage` | `number` | `1` | 初始页码（不传 params 时生效） |
+| `initialPageSize` | `number` | `10` | 初始每页条数（不传 params 时生效） |
 | `resetPageWhenPageSizeChange` | `boolean` | `true` | pageSize 变化时是否重置到第一页 |
+| `adjustPageWhenOutOfRange` | `boolean` | `true` | page 超出总页数时是否自动调整 |
 | `formatList` | `(list, rawData, params) => TFormatData[]` | - | 对列表项做二次处理 |
 
 ## 返回值
@@ -135,8 +123,11 @@ use-pagination/target
 |:---|:---|:---|
 | `list` | `ComputedRef<TFormatData[]>` | 当前页数据列表 |
 | `total` | `ComputedRef<number>` | 数据总条数 |
-| `page` | `Ref<number>` | 当前页码（可写） |
-| `pageSize` | `Ref<number>` | 每页条数（可写） |
+| `page` | `Ref<number>` | 当前页码（可写，代理到 params ref） |
+| `pageSize` | `Ref<number>` | 每页条数（可写，代理到 params ref） |
 | `totalPage` | `ComputedRef<number>` | 总页数 |
 | `isLastPage` | `ComputedRef<boolean>` | 是否最后一页 |
-| `reset` | `() => void` | 重置到第一页 |
+| `search` | `(params?: TParams) => Promise` | 提交搜索条件 + page 归 1 + 发请求 |
+| `debounceSearch` | `DebouncedFunction` | 防抖版 search |
+| `throttleSearch` | `DebouncedFunction` | 节流版 search |
+| `refresh` | `() => Promise` | 用当前参数重新请求 |

@@ -1,9 +1,9 @@
+import type { ApiResponse, UserItem } from './helpers.ts'
 import { describe, expect, it } from 'vitest'
+import { ref } from 'vue'
 import { usePagination } from '../../src/hooks'
 import { asyncAwait, withSetup } from '../utils.ts'
-import { UserItem, ApiResponse, mockService, dataSerializer } from './helpers.ts'
-
-const TOTAL = 25
+import { dataSerializer, mockService, TOTAL } from './helpers.ts'
 
 describe('usePagination dataSerializer', () => {
   it('自定义 dataSerializer 提取非标准字段', async () => {
@@ -13,13 +13,12 @@ describe('usePagination dataSerializer', () => {
       count: 3,
     })
 
-    const [{ list, total, run }] = withSetup(() =>
+    const [{ list, total }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: data => ({ list: data.items, total: data.count }),
       }),
     )
 
-    run({ page: 1, pageSize: 10 })
     await asyncAwait(100)
     expect(list.value).toEqual(['a', 'b', 'c'])
     expect(total.value).toBe(3)
@@ -29,7 +28,7 @@ describe('usePagination dataSerializer', () => {
     interface Raw { ids: number[], total: number }
     const service = async (_params: { page: number, pageSize: number }): Promise<Raw> => ({ ids: [1, 2, 3], total: 3 })
 
-    const [{ list, run }] = withSetup(() =>
+    const [{ list }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: data => ({
           list: data.ids.map(id => ({ id, label: `Item ${id}` })),
@@ -38,7 +37,6 @@ describe('usePagination dataSerializer', () => {
       }),
     )
 
-    run({ page: 1, pageSize: 10 })
     await asyncAwait(100)
     expect(list.value).toEqual([
       { id: 1, label: 'Item 1' },
@@ -50,14 +48,13 @@ describe('usePagination dataSerializer', () => {
 
 describe('usePagination formatList', () => {
   it('对列表项做格式化，total 保持不变', async () => {
-    const [{ list, total, run }] = withSetup(() =>
+    const [{ list, total }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         formatList: list => list.map(item => ({ ...item, name: item.name.toUpperCase() })),
       }),
     )
 
-    run({ page: 1, pageSize: 10 })
     await asyncAwait(100)
     expect(list.value).toHaveLength(10)
     expect(list.value[0]).toEqual({ id: 1, name: 'USER 1' })
@@ -66,7 +63,7 @@ describe('usePagination formatList', () => {
   })
 
   it('转换列表项类型', async () => {
-    const [{ list, total, run }] = withSetup(() =>
+    const [{ list, total }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         initialPageSize: 5,
@@ -74,7 +71,6 @@ describe('usePagination formatList', () => {
       }),
     )
 
-    run({ page: 1, pageSize: 5 })
     await asyncAwait(100)
     expect(list.value).toHaveLength(5)
     expect(list.value[0]).toEqual({ label: '1-User 1' })
@@ -82,14 +78,13 @@ describe('usePagination formatList', () => {
   })
 
   it('过滤列表项', async () => {
-    const [{ list, total, run }] = withSetup(() =>
+    const [{ list, total }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         formatList: list => list.filter(item => item.id > 5),
       }),
     )
 
-    run({ page: 1, pageSize: 10 })
     await asyncAwait(100)
     expect(list.value).toHaveLength(5)
     expect(list.value[0].id).toBe(6)
@@ -97,7 +92,7 @@ describe('usePagination formatList', () => {
   })
 
   it('翻页后 formatList 仍然生效', async () => {
-    const [{ list, page, run }] = withSetup(() =>
+    const [{ list, page }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         initialPageSize: 5,
@@ -105,7 +100,6 @@ describe('usePagination formatList', () => {
       }),
     )
 
-    run({ page: 1, pageSize: 5 })
     await asyncAwait(100)
     expect(list.value[0]).toEqual({ id: 1, name: 'USER 1' })
 
@@ -115,14 +109,13 @@ describe('usePagination formatList', () => {
   })
 
   it('不传 formatList 时列表保持原样', async () => {
-    const [{ list, total, run }] = withSetup(() =>
+    const [{ list, total }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         initialPageSize: 5,
       }),
     )
 
-    run({ page: 1, pageSize: 5 })
     await asyncAwait(100)
     expect(list.value).toHaveLength(5)
     expect(list.value[0]).toEqual({ id: 1, name: 'User 1' })
@@ -130,7 +123,7 @@ describe('usePagination formatList', () => {
   })
 
   it('formatList 抛错时 error 被正确设置', async () => {
-    const [{ error, list, run }] = withSetup(() =>
+    const [{ error, list }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         formatList: (list) => {
@@ -143,7 +136,6 @@ describe('usePagination formatList', () => {
       }),
     )
 
-    run({ page: 1, pageSize: 10 }).catch(() => {})
     await asyncAwait(100)
     expect(error.value).toBeInstanceOf(Error)
     expect((error.value as Error).message).toBe('id too large')
@@ -151,9 +143,10 @@ describe('usePagination formatList', () => {
   })
 
   it('formatList 可以添加额外字段', async () => {
-    const [{ list, run }] = withSetup(() =>
+    const [{ list }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
+        initialPageSize: 3,
         formatList: list => list.map(item => ({
           ...item,
           displayName: `[${item.id}] ${item.name}`,
@@ -161,7 +154,6 @@ describe('usePagination formatList', () => {
       }),
     )
 
-    run({ page: 1, pageSize: 3 })
     await asyncAwait(100)
     expect(list.value[0].displayName).toBe('[1] User 1')
     expect(list.value[2].displayName).toBe('[3] User 3')
@@ -171,7 +163,7 @@ describe('usePagination formatList', () => {
     let capturedRawData: any = null
     let capturedParams: any = null
 
-    const [{ run }] = withSetup(() =>
+    const [{ page }] = withSetup(() =>
       usePagination(mockService, {
         dataSerializer,
         initialPageSize: 5,
@@ -183,13 +175,15 @@ describe('usePagination formatList', () => {
       }),
     )
 
-    run({ page: 2, pageSize: 5 })
+    await asyncAwait(100)
+
+    page.value = 2
     await asyncAwait(100)
     expect(capturedRawData).toEqual({
       records: expect.any(Array),
       totalCount: TOTAL,
     })
-    // params 是对象形式
+    // params 是对象形式（committed + page/pageSize）
     expect(capturedParams).toEqual({ page: 2, pageSize: 5 })
   })
 
@@ -200,7 +194,7 @@ describe('usePagination formatList', () => {
     })
 
     let formatCalled = false
-    const [{ list, total, run }] = withSetup(() =>
+    const [{ list, total }] = withSetup(() =>
       usePagination(emptyService, {
         dataSerializer,
         formatList: (list) => {
@@ -210,7 +204,6 @@ describe('usePagination formatList', () => {
       }),
     )
 
-    run({ page: 1, pageSize: 10 })
     await asyncAwait(100)
     expect(formatCalled).toBe(true)
     expect(list.value).toHaveLength(0)
@@ -229,16 +222,15 @@ describe('usePagination formatList', () => {
       return { records, totalCount: TOTAL }
     }
 
-    const [{ list, run }] = withSetup(() =>
+    const [{ list }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: (data: any) => ({ list: data.records, total: data.totalCount }),
         paginationFields: { page: 'current', pageSize: 'size' },
-        initialPageSize: 5,
+        params: ref({ current: 1, size: 5 }),
         formatList: list => list.map(item => ({ ...item, name: item.name.toUpperCase() })),
       }),
     )
 
-    run({ current: 1, size: 5 })
     await asyncAwait(100)
     expect(list.value).toHaveLength(5)
     expect(list.value[0]).toEqual({ id: 1, name: 'USER 1' })
@@ -255,14 +247,14 @@ describe('usePagination paginationFields', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, pageSize, run }] = withSetup(() =>
+    const [{ page, pageSize }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         paginationFields: { page: 'current', pageSize: 'size' },
+        params: ref({ current: 1, size: 10 }),
       }),
     )
 
-    run({ current: 1, size: 10 })
     await asyncAwait(100)
     expect(capturedParams).toEqual({ current: 1, size: 10 })
 
@@ -283,13 +275,12 @@ describe('usePagination paginationFields', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, run }] = withSetup(() =>
+    const [{ page }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
       }),
     )
 
-    run({ page: 1, pageSize: 10 })
     await asyncAwait(100)
     expect(capturedParams).toEqual({ page: 1, pageSize: 10 })
 
@@ -306,15 +297,14 @@ describe('usePagination paginationFields', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, run }] = withSetup(() =>
+    const [{ page }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         paginationFields: { page: 'current', pageSize: 'size' },
-        defaultParams: { name: 'test', status: 'active', current: 1, size: 10 },
+        params: ref({ name: 'test', status: 'active', current: 1, size: 10 }),
       }),
     )
 
-    run({ name: 'test', status: 'active', current: 1, size: 10 })
     await asyncAwait(100)
     expect(capturedParams).toEqual({ name: 'test', status: 'active', current: 1, size: 10 })
 
@@ -331,15 +321,14 @@ describe('usePagination paginationFields', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, run }] = withSetup(() =>
+    const [{ page }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         paginationFields: { page: 'current', pageSize: 'size' },
-        defaultParams: { name: 'test', current: 99, size: 99 },
+        params: ref({ name: 'test', current: 1, size: 10 }),
       }),
     )
 
-    run({ name: 'test', current: 1, size: 10 })
     await asyncAwait(100)
     expect(capturedParams).toEqual({ name: 'test', current: 1, size: 10 })
 
@@ -356,15 +345,14 @@ describe('usePagination paginationFields', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, run }] = withSetup(() =>
+    const [{ page }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         paginationFields: { page: 'page', pageSize: 'pageSize' },
-        defaultParams: { name: 'test', page: 1, pageSize: 10, sort: 'name' },
+        params: ref({ name: 'test', page: 1, pageSize: 10, sort: 'name' }),
       }),
     )
 
-    run({ name: 'test', page: 1, pageSize: 10, sort: 'name' })
     await asyncAwait(100)
     expect(capturedParams).toEqual({ name: 'test', page: 1, pageSize: 10, sort: 'name' })
 
@@ -381,28 +369,27 @@ describe('usePagination paginationFields', () => {
       return { list: [] as UserItem[], total: 100 }
     }
 
-    const [{ page, pageSize, run }] = withSetup(() =>
+    const [{ page, pageSize }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 100 }),
         paginationFields: { page: 'current', pageSize: 'size' },
+        params: ref({ current: 1, size: 10 }),
       }),
     )
 
-    // usePagination auto-triggers first request on init (manual: false by default)
-    run({ current: 1, size: 10 })
+    // usePagination 初始化时自动触发首次请求
     await asyncAwait(100)
-    expect(paramsList).toHaveLength(2)
+    expect(paramsList).toHaveLength(1)
     expect(paramsList[0]).toEqual({ current: 1, size: 10 })
-    expect(paramsList[1]).toEqual({ current: 1, size: 10 })
 
     page.value = 2
     await asyncAwait(100)
-    expect(paramsList).toHaveLength(3)
-    expect(paramsList[2]).toEqual({ current: 2, size: 10 })
+    expect(paramsList).toHaveLength(2)
+    expect(paramsList[1]).toEqual({ current: 2, size: 10 })
 
     pageSize.value = 20
     await asyncAwait(100)
-    expect(paramsList).toHaveLength(4)
-    expect(paramsList[3]).toEqual({ current: 1, size: 20 })
+    expect(paramsList).toHaveLength(3)
+    expect(paramsList[2]).toEqual({ current: 1, size: 20 })
   })
 })

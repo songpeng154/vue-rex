@@ -51,8 +51,8 @@ interface CreatePaginationConfig<
    */
   paginationFields?: PaginationFields
 
-  /** 全局默认配置，会被调用时的 options 覆盖 */
-  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationFields' | 'errorSerializer'>
+  /** 全局默认配置，会被调用时的 options 覆盖（params 为每次调用时传入） */
+  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationFields' | 'errorSerializer' | 'params'>
 }
 ```
 
@@ -75,17 +75,26 @@ function usePage<
 ## 使用示例
 
 ```typescript
-import { createPagination } from 'norm-fetch/vue-rex'
+import { ref } from 'vue'
+import { createPagination } from 'vue-rex'
 
 const usePage = createPagination({
   listKey: 'data.list',
   totalKey: 'data.total',
-  paginationFields: { page: 'page', pageSize: 'size' }
 })
 
-const { list, total, page, pageSize, loading, run } = usePage(
-  (params) => fetch('/api/list', params)
+const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
+
+const { list, total, page, pageSize, loading, search } = usePage(
+  (params) => fetch('/api/list', params),
+  { params: searchParams },
 )
+
+// 搜索
+search()
+
+// 翻页
+page.value = 2
 ```
 
 ## 相关类型

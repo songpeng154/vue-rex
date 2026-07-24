@@ -38,6 +38,7 @@ export interface CreatePaginationConfig<
 
   /**
    * 全局默认配置，会被调用时的 options 覆盖
+   * params 为每次调用时传入，不在工厂级配置
    */
-  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationFields' | 'errorSerializer'>
+  options?: Omit<PaginationOptions, 'dataSerializer' | 'paginationFields' | 'errorSerializer' | 'params'>
 }

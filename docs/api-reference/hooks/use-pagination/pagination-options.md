@@ -18,37 +18,34 @@ export interface PaginationOptions<
   TParams extends Record<string, any> = Record<string, any>,
   TItem = any,
   TFormatData = TItem,
+  TError = any,
 > extends Omit<
     RequestOptions<
       TData,
       [TParams],
       PaginationData<TItem>,
-      PaginationData<TFormatData>
+      PaginationData<TFormatData>,
+      TError
     >,
     'dataSerializer' | 'formatData' | 'defaultParams'
     | 'onSuccess' | 'onError' | 'onBefore' | 'onFinally' | 'onFinallyFetchDone'
   > {
-  /** 初始页码 */
+  /** 表单参数 ref，包含搜索字段和分页字段 */
+  params?: Ref<TParams>
+
+  /** 初始页码（不传 params 时生效） @default 1 */
   initialPage?: number
 
-  /** 初始每页条数 */
+  /** 初始每页条数（不传 params 时生效） @default 10 */
   initialPageSize?: number
-
-  /**
-   * page 变化时是否自动刷新
-   * 为 true 时会自动禁用 watchSource 的依赖自动收集（watchSource: true），
-   * 避免 page/pageSize 变化时重复请求；显式传入 watchSource: Ref[] 仍会保留
-   * @default true
-   */
-  pageWatch?: boolean
 
   /** pageSize 变化时是否重置 page @default true */
   resetPageWhenPageSizeChange?: boolean
 
-  /** 默认参数，直接传对象即可 */
-  defaultParams?: TParams
+  /** page 超出总页数时是否自动调整 @default true */
+  adjustPageWhenOutOfRange?: boolean
 
-  /** 分页字段映射，用于适配后端不同的字段名 @default { page: 'page', pageSize: 'pageSize' } */
+  /** 分页字段映射 @default { page: 'page', pageSize: 'pageSize' } */
   paginationFields?: PaginationFields
 
   /** 从 server 返回数据中提取 list 和 total */
@@ -61,17 +58,10 @@ export interface PaginationOptions<
   onBefore?: (params: TParams) => void
 
   /** 请求成功时执行 */
-  onSuccess?: (
-    data: PaginationData<TFormatData>,
-    rawData: TData,
-    params: TParams,
-  ) => void
+  onSuccess?: (data: PaginationData<TFormatData>, rawData: TData, params: TParams) => void
 
   /** 请求错误的时候执行 */
-  onError?: (
-    error: any,
-    params: TParams,
-  ) => void
+  onError?: (error: TError, params: TParams) => void
 
   /** 最后执行，不管 service 成功失败都会执行 */
   onFinally?: (params: TParams) => void
@@ -83,52 +73,49 @@ export interface PaginationOptions<
 
 ## 泛型
 
-| 名称            | 默认值       | 继承      | 可选  | 描述              |
-|:--------------|:----------|:--------|:----|-----------------|
-| `TData`       | `any`     |         | `是` | service 返回的数据类型 |
-| `TParams`     | `Record<string, any>` | `Record<string, any>` | `是` | 分页请求参数类型 |
-| `TItem`       | `any`     |         | `是` | 列表项类型          |
-| `TFormatData` | `TItem`   |         | `是` | 格式化后的列表项类型    |
-
-## 继承
-
-继承自 `RequestOptions<TData, [TParams], PaginationData<TItem>, PaginationData<TFormatData>>`，但不包含 `dataSerializer`、`formatData`、`defaultParams`、`onSuccess`、`onError`、`onBefore`、`onFinally`、`onFinallyFetchDone`。
+| 名称            | 默认值       | 可选  | 描述              |
+|:--------------|:----------|:----|-----------------|
+| `TData`       | `any`     | `是` | service 返回的数据类型 |
+| `TParams`     | `Record<string, any>` | `是` | 分页请求参数类型 |
+| `TItem`       | `any`     | `是` | 列表项类型          |
+| `TFormatData` | `TItem`   | `是` | 格式化后的列表项类型    |
+| `TError`      | `any`     | `是` | 错误类型          |
 
 ## 属性
+
+### params
+
+* `可选` - `Ref<TParams>`
+
+表单参数 ref，包含搜索字段和分页字段（page / pageSize）。hook 会在此 ref 上建立 page / pageSize 的 computed 代理。搜索字段通过 `search()` 提交后才会用于请求。不传时 hook 内部自建，仅含 page / pageSize。
 
 ### initialPage
 
 * `可选` - `number`
 * 默认值：`1`
 
-初始页码
+初始页码（不传 params 时生效）
 
 ### initialPageSize
 
 * `可选` - `number`
 * 默认值：`10`
 
-初始每页条数
-
-### pageWatch
-
-* `可选` - `boolean`
-* 默认值：`true`
-
-page 变化时是否自动刷新。为 `true` 时会自动禁用 `watchSource` 的依赖自动收集，避免 page/pageSize 变化时重复请求。显式传入 `watchSource: Ref[]` 仍会保留。
+初始每页条数（不传 params 时生效）
 
 ### resetPageWhenPageSizeChange
 
 * `可选` - `boolean`
 * 默认值：`true`
 
-pageSize 变化时是否重置 page
+pageSize 变化时是否重置 page 到第一页
 
-### defaultParams
+### adjustPageWhenOutOfRange
 
-* `可选` - `TParams`
+* `可选` - `boolean`
+* 默认值：`true`
 
-默认参数，直接传对象即可
+请求返回后 page 超出总页数时是否自动调整到最后一页
 
 ### paginationFields
 
@@ -149,75 +136,6 @@ pageSize 变化时是否重置 page
 
 格式化列表项，total 保持不变
 
-### onBefore
+### onBefore / onSuccess / onError / onFinally / onFinallyFetchDone
 
-请求之前执行
-
-#### 入参
-
-| 名称       | 类型        | 默认值 | 描述 |
-|:---------|:----------|:----|:---|
-| `params` | `TParams` |     | 入参 |
-
-#### 返回值
-
-`void`
-
-### onSuccess
-
-请求成功时执行
-
-#### 入参
-
-| 名称       | 类型                                 | 默认值 | 描述        |
-|:---------|:-----------------------------------|:----|:----------|
-| `data`   | `PaginationData<TFormatData>`      |     | 分页数据      |
-| `rawData`| `TData`                            |     | 原始数据      |
-| `params` | `TParams`                          |     | 入参        |
-
-#### 返回值
-
-`void`
-
-### onError
-
-请求错误的时候执行
-
-#### 入参
-
-| 名称       | 类型        | 默认值 | 描述 |
-|:---------|:----------|:----|:---|
-| `error`  | `any`     |     | 错误信息 |
-| `params` | `TParams` |     | 入参 |
-
-#### 返回值
-
-`void`
-
-### onFinally
-
-最后执行，不管 service 成功失败都会执行
-
-#### 入参
-
-| 名称       | 类型        | 默认值 | 描述 |
-|:---------|:----------|:----|:---|
-| `params` | `TParams` |     | 入参 |
-
-#### 返回值
-
-`void`
-
-### onFinallyFetchDone
-
-当连续请求的时候，最后一个服务请求完成之后触发
-
-#### 入参
-
-| 名称       | 类型        | 默认值 | 描述 |
-|:---------|:----------|:----|:---|
-| `params` | `TParams` |     | 入参 |
-
-#### 返回值
-
-`void`
+生命周期回调，params 参数为当前请求参数（已提交的搜索字段 + 当前 page / pageSize）。

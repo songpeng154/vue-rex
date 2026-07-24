@@ -22,10 +22,10 @@ interface User { id: number; name: string }
 const getUsers = (params: { page: number; pageSize: number }) =>
   server.get<{ data: { list: User[]; total: number } }>('/api/users', { params })
 
-const { list, total, page, pageSize, totalPage, isLastPage, reset } = usePage(getUsers)
+const { list, total, page, pageSize, totalPage, isLastPage } = usePage(getUsers)
 ```
 
-Change `page` or `pageSize` to auto-trigger a request; call `reset()` to return to page 1.
+Change `page` or `pageSize` to auto-trigger a request.
 
 ::: demo
 use-pagination/base
@@ -53,20 +53,23 @@ use-pagination/pagination-fields
 
 ## Search + Pagination
 
-Reset to page 1 and push new conditions on search: `page.value = 1` + `run(params)`.
+Pass a `params` ref as the form model. `search()` commits search conditions and resets to page 1:
 
 ```typescript
 const searchParams = ref({ page: 1, pageSize: 10, keyword: '' })
 
-const { list, page, run } = usePage(getUsers, {
-  defaultParams: searchParams.value,
+const { list, page, search } = usePage(getUsers, {
+  params: searchParams,
 })
 
-const onSearch = () => {
-  page.value = 1
-  run({ ...searchParams.value, page: 1 })
-}
+// Search: commit current form values + page → 1 + request
+const onSearch = () => search()
+
+// Or pass explicit params (writes to form ref then commits)
+search({ keyword: 'abc' })
 ```
+
+Pagination uses the last committed search conditions — uncommitted form changes don't affect page requests.
 
 ::: demo
 use-pagination/search-with-pagination
@@ -90,22 +93,6 @@ const { list } = usePage(getUsers, {
 use-pagination/format-list
 :::
 
-## Load More
-
-Set `addedMode: true` to append data on page change instead of replacing:
-
-::: demo
-use-pagination/added-mode
-:::
-
-## Scroll Loading
-
-Use `target` to specify a scroll container; automatically loads the next page when scrolled to the bottom:
-
-::: demo
-use-pagination/target
-:::
-
 ## Configuration
 
 | Config | Type | Description |
@@ -121,10 +108,11 @@ use-pagination/target
 
 | Option | Type | Default | Description |
 |:---|:---|:---|:---|
-| `initialPage` | `number` | `1` | Initial page number |
-| `initialPageSize` | `number` | `10` | Initial page size |
-| `pageWatch` | `boolean` | `true` | Auto-request on page change |
+| `params` | `Ref<TParams>` | - | Form params ref, page/pageSize are proxied via computed |
+| `initialPage` | `number` | `1` | Initial page (used when no `params` provided) |
+| `initialPageSize` | `number` | `10` | Initial page size (used when no `params` provided) |
 | `resetPageWhenPageSizeChange` | `boolean` | `true` | Reset to page 1 when pageSize changes |
+| `adjustPageWhenOutOfRange` | `boolean` | `true` | Auto-adjust page when it exceeds total pages |
 | `formatList` | `(list, rawData, params) => TFormatData[]` | - | Transform list items |
 
 ## Return Value
@@ -135,8 +123,11 @@ Extends [createRequest return value](../use-request/introduction.md#return-value
 |:---|:---|:---|
 | `list` | `ComputedRef<TFormatData[]>` | Current page data |
 | `total` | `ComputedRef<number>` | Total record count |
-| `page` | `Ref<number>` | Current page (writable) |
-| `pageSize` | `Ref<number>` | Page size (writable) |
+| `page` | `Ref<number>` | Current page (writable, proxied to params ref) |
+| `pageSize` | `Ref<number>` | Page size (writable, proxied to params ref) |
 | `totalPage` | `ComputedRef<number>` | Total pages |
 | `isLastPage` | `ComputedRef<boolean>` | Whether last page |
-| `reset` | `() => void` | Reset to first page |
+| `search` | `(params?: TParams) => Promise` | Commit search conditions + page → 1 + request |
+| `debounceSearch` | `DebouncedFunction` | Debounced search |
+| `throttleSearch` | `DebouncedFunction` | Throttled search |
+| `refresh` | `() => Promise` | Re-request with current params |

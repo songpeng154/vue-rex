@@ -32,22 +32,17 @@ const getUsers = async (params: { page: number; pageSize: number; keyword?: stri
 
 const searchParams = ref({ page: 1, pageSize: 5, keyword: '' })
 
-const { list, loading, page, pageSize, total, totalPage, run } = usePage(getUsers, {
-  defaultParams: searchParams.value,
-  initialPageSize: 5,
+const { list, loading, page, pageSize, total, totalPage, search } = usePage(getUsers, {
+  params: searchParams,
 })
 
-// 搜索：重置到第一页 + 推入新条件
-const onSearch = () => {
-  page.value = 1
-  run({ ...searchParams.value, page: 1 })
-}
+// 搜索：提交表单条件 + page 归 1 + 发请求
+const onSearch = () => search()
 
-// 重置：清空关键词 + 回到第一页
+// 重置：清空关键词 + 重新搜索
 const onReset = () => {
   searchParams.value.keyword = ''
-  page.value = 1
-  run({ page: 1, pageSize: pageSize.value, keyword: '' })
+  search()
 }
 </script>
 
@@ -80,7 +75,7 @@ const onReset = () => {
         <button :disabled="page >= totalPage" @click="page++">下一页</button>
       </div>
     </div>
-    <p class="hint">搜索时 page.value = 1 + run(params)，确保回到第一页且只发一次请求</p>
+    <p class="hint">search() 提交表单搜索条件并自动回到第一页，翻页时保留已提交的搜索条件</p>
   </div>
 </template>
 

@@ -1,6 +1,9 @@
+import { fileURLToPath } from 'node:url'
 import UnoCSS from 'unocss/vite'
 import { defineConfig } from 'vitepress'
 import { setupContainerDemo } from './container/demo'
+
+const r = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
 export default defineConfig({
   base: '/vue-rex/',
@@ -19,6 +22,11 @@ export default defineConfig({
     lineNumbers: true,
   },
   vite: {
+    resolve: {
+      alias: {
+        'vue-rex': r('../../src/index.ts'),
+      },
+    },
     server: {
       hmr: true,
     },

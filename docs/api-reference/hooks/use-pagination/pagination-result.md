@@ -19,40 +19,27 @@ export interface PaginationResult<
   TParams extends Record<string, any> = Record<string, any>,
   TItem = any,
   TFormatData = TItem,
+  TError = any,
 > extends Omit<
     RequestResult<
       TData,
       [TParams],
       PaginationData<TItem>,
-      PaginationData<TFormatData>
+      PaginationData<TFormatData>,
+      TError
     >,
-    'params' | 'run' | 'debounceRun' | 'throttleRun' | 'optimisticUpdate'
+    'params' | 'run' | 'debounceRun' | 'throttleRun' | 'refresh' | 'optimisticUpdate'
   > {
-  /** 当前请求参数 */
+  /** 当前请求参数（已提交的搜索字段 + 当前 page / pageSize） */
   params: ComputedRef<TParams>
-
-  /** 手动触发 service 执行 */
-  run: (params: TParams) => Promise&lt; Undefinable&lt; PaginationData&lt; TFormatData &gt; &gt; &gt;
-
-  /** 与 run 用法一致，带防抖 */
-  debounceRun: DebouncedFunction<(params: TParams) => Promise&lt; Undefinable&lt; PaginationData&lt; TFormatData &gt; &gt; &gt;>
-
-  /** 与 run 用法一致，带节流 */
-  throttleRun: DebouncedFunction<(params: TParams) => Promise&lt; Undefinable&lt; PaginationData&lt; TFormatData &gt; &gt; &gt;>
-
-  /** 乐观更新 */
-  optimisticUpdate: (
-    newData: PaginationData<TFormatData> | ((oldData: PaginationData<TFormatData>) => PaginationData<TFormatData>),
-    params?: TParams,
-  ) => void
 
   /** 当前列表数据 */
   list: ComputedRef<TFormatData[]>
 
-  /** 当前页码（可写） */
+  /** 当前页码（可写，代理到 params ref） */
   page: Ref<number>
 
-  /** 每页条数（可写） */
+  /** 每页条数（可写，代理到 params ref） */
   pageSize: Ref<number>
 
   /** 数据总条数 */
@@ -64,25 +51,42 @@ export interface PaginationResult<
   /** 是否已是最后一页 */
   isLastPage: ComputedRef<boolean>
 
-  /** 重置到第一页 */
-  reset: () => void
+  /** 搜索：提交搜索条件 + page 归 1 + 触发请求 */
+  search: (params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>
+
+  /** 防抖版 search */
+  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>>
+
+  /** 节流版 search */
+  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>>
+
+  /** 使用当前参数重新请求 */
+  refresh: () => Promise<Undefinable<PaginationData<TFormatData>>>
+
+  /** 乐观更新 */
+  optimisticUpdate: (
+    newData: PaginationData<TFormatData> | ((oldData: PaginationData<TFormatData>) => PaginationData<TFormatData>),
+  ) => void
 }
 ```
 
 ## 泛型
 
-| 名称            | 默认值       | 继承      | 可选  | 描述              |
-|:--------------|:----------|:--------|:----|-----------------|
-| `TData`       | `any`     |         | `是` | service 返回的数据类型 |
-| `TParams`     | `Record<string, any>` | `Record<string, any>` | `是` | 分页请求参数类型 |
-| `TItem`       | `any`     |         | `是` | 列表项类型          |
-| `TFormatData` | `TItem`   |         | `是` | 格式化后的列表项类型    |
-
-## 继承
-
-[RequestResult&lt;TData, [TParams], PaginationData&lt;TItem&gt;, PaginationData&lt;TFormatData&gt;&gt;](../use-request/request-result)
+| 名称            | 默认值       | 可选  | 描述              |
+|:--------------|:----------|:----|-----------------|
+| `TData`       | `any`     | `是` | service 返回的数据类型 |
+| `TParams`     | `Record<string, any>` | `是` | 分页请求参数类型 |
+| `TItem`       | `any`     | `是` | 列表项类型          |
+| `TFormatData` | `TItem`   | `是` | 格式化后的列表项类型    |
+| `TError`      | `any`     | `是` | 错误类型          |
 
 ## 属性
+
+### params
+
+* `必填` - `ComputedRef<TParams>`
+
+当前请求参数（已提交的搜索字段 + 当前 page / pageSize）
 
 ### list
 
@@ -93,16 +97,14 @@ export interface PaginationResult<
 ### page
 
 * `必填` - `Ref<number>`
-* 默认值：`1`
 
-当前页码（可写）
+当前页码（可写，代理到 params ref）
 
 ### pageSize
 
 * `必填` - `Ref<number>`
-* 默认值：`10`
 
-每页条数（可写）
+每页条数（可写，代理到 params ref）
 
 ### total
 
@@ -124,47 +126,35 @@ export interface PaginationResult<
 
 ## 方法
 
-### run
+### search
 
-手动触发 service 执行
-
-#### 入参
-
-| 名称       | 类型        | 默认值 | 描述   |
-|:---------|:----------|:----|:-----|
-| `params` | `TParams` |     | 请求参数 |
-
-#### 返回值
-
-`Promise&lt; Undefinable&lt; PaginationData&lt; TFormatData &gt; &gt; &gt;`
-
-### debounceRun
-
-与 [run](#run) 用法一致，带防抖
+提交搜索条件 + page 归 1 + 触发请求。无参时提交 params ref 中的当前表单值；传参时先写入 params ref 再提交。
 
 #### 入参
 
 | 名称       | 类型        | 默认值 | 描述   |
 |:---------|:----------|:----|:-----|
-| `params` | `TParams` |     | 请求参数 |
+| `params` | `TParams` | 可选 | 搜索参数，写入表单 ref 后提交 |
 
 #### 返回值
 
-`Promise&lt; Undefinable&lt; PaginationData&lt; TFormatData &gt; &gt; &gt;`
+`Promise<Undefinable<PaginationData<TFormatData>>>`
 
-### throttleRun
+### debounceSearch
 
-与 [run](#run) 用法一致，带节流
+与 [search](#search) 用法一致，带防抖
 
-#### 入参
+### throttleSearch
 
-| 名称       | 类型        | 默认值 | 描述   |
-|:---------|:----------|:----|:-----|
-| `params` | `TParams` |     | 请求参数 |
+与 [search](#search) 用法一致，带节流
+
+### refresh
+
+使用当前参数重新请求
 
 #### 返回值
 
-`Promise&lt; Undefinable&lt; PaginationData&lt; TFormatData &gt; &gt; &gt;`
+`Promise<Undefinable<PaginationData<TFormatData>>>`
 
 ### optimisticUpdate
 
@@ -174,16 +164,7 @@ export interface PaginationResult<
 
 | 名称        | 类型                                                                                     | 默认值 | 描述 |
 |:----------|:---------------------------------------------------------------------------------------|:----|:---|
-| `newData` | `PaginationData&lt;TFormatData&gt; \| ((oldData: PaginationData&lt;TFormatData&gt;) =&gt; PaginationData&lt;TFormatData&gt;)` |     | 新数据 |
-| `params`  | `TParams`                                                                              | 可选 | 入参 |
-
-#### 返回值
-
-`void`
-
-### reset
-
-重置到第一页
+| `newData` | `PaginationData<TFormatData> \| ((oldData: PaginationData<TFormatData>) => PaginationData<TFormatData>)` |     | 新数据 |
 
 #### 返回值
 

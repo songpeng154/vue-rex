@@ -39,8 +39,8 @@ import { usePagination } from '../../hooks'
  * })
  *
  * // 组件里 — 自动推导，无需泛型
- * const { list } = usePage(getUserList)   // list.value → User[]   ✅
- * const { list } = usePage(getPostList)   // list.value → Post[]   ✅
+ * const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
+ * const { list, page, search } = usePage(getUserList, { params: searchParams })
  */
 export function createPagination<
   TListKey extends string,

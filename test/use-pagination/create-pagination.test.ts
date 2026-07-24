@@ -24,8 +24,7 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, total, run }] = withSetup(() => usePage(service))
-      run({ page: 1, pageSize: 10 })
+      const [{ list, total }] = withSetup(() => usePage(service))
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(10)
@@ -40,8 +39,7 @@ describe('createPagination', () => {
         return { list: [] as UserItem[], total: 0 }
       }
 
-      const [{ list, total, run }] = withSetup(() => usePage(service))
-      run({ page: 1, pageSize: 10 })
+      const [{ list, total }] = withSetup(() => usePage(service))
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(0)
@@ -59,8 +57,7 @@ describe('createPagination', () => {
         return { records: generateUsers(start, params.pageSize), totalCount: TOTAL }
       }
 
-      const [{ list, total, run }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
-      run({ page: 1, pageSize: 5 })
+      const [{ list, total }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(5)
@@ -77,8 +74,7 @@ describe('createPagination', () => {
         return { rows: generateUsers(start, params.pageSize), count: TOTAL }
       }
 
-      const [{ list, total, run }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
-      run({ page: 1, pageSize: 5 })
+      const [{ list, total }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(5)
@@ -96,13 +92,9 @@ describe('createPagination', () => {
         return { code: 0, data: { records: generateUsers(start, params.pageSize), total: TOTAL } }
       }
 
-      const [{ list, data, rawData, total, run }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
-      run({ page: 1, pageSize: 5 })
-      // data.value
+      const [{ list, total }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
       await asyncAwait(100)
 
-      console.log(data.value)
-      console.log(rawData)
       expect(list.value).toHaveLength(5)
       expect(list.value[0]).toEqual({ id: 1, name: 'User 1' })
       expect(total.value).toBe(12)
@@ -115,8 +107,7 @@ describe('createPagination', () => {
         return { code: 0, data: null as any }
       }
 
-      const [{ list, total, run }] = withSetup(() => usePage(service))
-      run({ page: 1, pageSize: 10 })
+      const [{ list, total }] = withSetup(() => usePage(service))
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(0)
@@ -139,8 +130,7 @@ describe('createPagination', () => {
         return { list: [] as UserItem[], total: 0 }
       }
 
-      const [{ page, run }] = withSetup(() => usePage(service))
-      run({ current: 1, size: 10 })
+      const [{ page }] = withSetup(() => usePage(service))
       await asyncAwait(100)
       expect(capturedParams).toEqual({ current: 1, size: 10 })
 
@@ -164,8 +154,7 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, pageSize, run }] = withSetup(() => usePage(service))
-      run({ page: 1, pageSize: 5 })
+      const [{ list, pageSize }] = withSetup(() => usePage(service))
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(5)
@@ -185,11 +174,10 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, pageSize, run }] = withSetup(() =>
+      const [{ list, pageSize }] = withSetup(() =>
         usePage(service, { initialPageSize: 10 }),
       )
 
-      run({ page: 1, pageSize: 10 })
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(10)
@@ -212,8 +200,7 @@ describe('createPagination', () => {
         return { list: [] as UserItem[], total: 0 }
       }
 
-      const [{ run }] = withSetup(() => usePage(service))
-      run({ page: 1, pageSize: 10 })
+      withSetup(() => usePage(service))
       await asyncAwait(100)
 
       expect(configSuccess).toBe(true)
@@ -236,12 +223,11 @@ describe('createPagination', () => {
         return { list: [] as UserItem[], total: 0 }
       }
 
-      const [{ run }] = withSetup(() =>
+      withSetup(() =>
         usePage(service, {
           onSuccess: () => { localCalled = true },
         }),
       )
-      run({ page: 1, pageSize: 10 })
       await asyncAwait(100)
 
       expect(configCalled).toBe(false)
@@ -259,14 +245,13 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, total, run }] = withSetup(() =>
+      const [{ list, total }] = withSetup(() =>
         usePage(service, {
           initialPageSize: 5,
           formatList: items => items.map(item => ({ ...item, name: item.name.toUpperCase() })),
         }),
       )
 
-      run({ page: 1, pageSize: 5 })
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(5)
@@ -283,14 +268,13 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, run }] = withSetup(() =>
+      const [{ list }] = withSetup(() =>
         usePage(service, {
           initialPageSize: 3,
           formatList: items => items.map(item => ({ label: `${item.id}-${item.name}` })),
         }),
       )
 
-      run({ page: 1, pageSize: 3 })
       await asyncAwait(100)
 
       expect(list.value).toHaveLength(3)
@@ -308,11 +292,10 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, page, run }] = withSetup(() =>
+      const [{ list, page }] = withSetup(() =>
         usePage(service, { initialPageSize: 5 }),
       )
 
-      run({ page: 1, pageSize: 5 })
       await asyncAwait(100)
       expect(list.value[0]).toEqual({ id: 1, name: 'User 1' })
 
@@ -330,11 +313,10 @@ describe('createPagination', () => {
         return { list: generateUsers(start, params.pageSize), total: TOTAL }
       }
 
-      const [{ list, page, pageSize, run }] = withSetup(() =>
+      const [{ list, page, pageSize }] = withSetup(() =>
         usePage(service, { initialPageSize: 5 }),
       )
 
-      run({ page: 1, pageSize: 5 })
       await asyncAwait(100)
       page.value = 3
       await asyncAwait(100)
@@ -369,13 +351,11 @@ describe('createPagination', () => {
         }
       }
 
-      const [{ list: userList, run: runUser }] = withSetup(() => usePage(getUserList))
-      runUser({ page: 1, pageSize: 10 })
+      const [{ list: userList }] = withSetup(() => usePage(getUserList))
       await asyncAwait(100)
       expect(userList.value[0]).toEqual({ id: 1, name: 'Alice' })
 
-      const [{ list: postList, run: runPost }] = withSetup(() => usePage(getPostList))
-      runPost({ page: 1, pageSize: 10 })
+      const [{ list: postList }] = withSetup(() => usePage(getPostList))
       await asyncAwait(100)
       expect(postList.value[0]).toEqual({ postId: 'p1', title: 'Hello' })
     })
@@ -398,8 +378,7 @@ describe('createPagination', () => {
         return { code: 0, data: { records: generateUsers(start, params.size), count: TOTAL } }
       }
 
-      const [{ list, total, page, run }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
-      run({ current: 1, size: 5 })
+      const [{ list, total, page }] = withSetup(() => usePage(service, { initialPageSize: 5 }))
       await asyncAwait(100)
 
       expect(capturedParams).toEqual({ current: 1, size: 5 })
