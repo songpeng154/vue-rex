@@ -1,7 +1,7 @@
 {
   "name": "vue-rex",
   "type": "module",
-  "version": "1.1.21",
+  "version": "1.1.23",
   "description": "Vue Rex 是一个面向 Vue 3 的高度灵活、类型安全且插件化的请求 Hook 库，支持多后端适配、缓存、分页、插件化扩展等特性。",
   "author": {
     "email": "419626398@qq.com",
