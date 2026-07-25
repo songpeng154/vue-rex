@@ -1,6 +1,5 @@
 import type { DebouncedFunction } from 'es-toolkit'
 import type { ComputedRef, Ref } from 'vue'
-import type { Undefinable } from '../../types/utils.ts'
 import type { RequestOptions, RequestResult } from '../request/types.ts'
 
 /**
@@ -109,7 +108,7 @@ export interface PaginationResult<
       PaginationData<TFormatData>,
       TError
     >,
-    'params' | 'run' | 'debounceRun' | 'throttleRun' | 'refresh' | 'optimisticUpdate'
+    'params' | 'run' | 'runAsync' | 'debounceRun' | 'throttleRun' | 'refresh' | 'refreshAsync' | 'optimisticUpdate'
   > {
   /** 当前请求参数（已提交的搜索字段 + 当前 page / pageSize） */
   params: ComputedRef<TParams>
@@ -133,20 +132,28 @@ export interface PaginationResult<
   isLastPage: ComputedRef<boolean>
 
   /**
-   * 搜索：提交搜索条件 + page 归 1 + 触发请求
+   * 搜索：提交搜索条件 + page 归 1 + 触发请求（静默模式）
    * - 无参：提交 params ref 中的当前表单值
    * - 传参：先写入 params ref，再提交
    */
-  search: (params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>
+  search: (params?: TParams) => Promise<void>
+
+  /**
+   * 搜索（Promise 模式）：提交搜索条件 + page 归 1 + 触发请求。请求失败抛出异常
+   */
+  searchAsync: (params?: TParams) => Promise<PaginationData<TFormatData>>
 
   /** 与 search 用法一致，带防抖 */
-  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>>
+  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
 
   /** 与 search 用法一致，带节流 */
-  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>>
+  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
 
-  /** 使用当前参数重新请求 */
-  refresh: () => Promise<Undefinable<PaginationData<TFormatData>>>
+  /** 使用当前参数重新请求（静默模式） */
+  refresh: () => Promise<void>
+
+  /** 使用当前参数重新请求（Promise 模式） */
+  refreshAsync: () => Promise<PaginationData<TFormatData>>
 
   /** 乐观更新 */
   optimisticUpdate: (

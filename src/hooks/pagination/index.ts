@@ -147,6 +147,10 @@ export function usePagination<
     return fetchInstance.run(requestParams.value)
   }
 
+  const doRequestAsync = () => {
+    return fetchInstance.runAsync(requestParams.value)
+  }
+
   // 首次请求（非 manual 时）
   if (!manual)
     doRequest()
@@ -187,8 +191,18 @@ export function usePagination<
     return doRequest()
   }
 
+  const searchAsync = (searchParams?: TParams) => {
+    if (searchParams)
+      Object.assign(paramsRef.value, searchParams)
+    suppressWatch = true
+    committed.value = { ...paramsRef.value }
+    page.value = 1
+    return doRequestAsync()
+  }
+
   // ─── refresh ──────────────────────────────────────────────
   const refresh = () => fetchInstance.run(requestParams.value)
+  const refreshAsync = () => fetchInstance.runAsync(requestParams.value)
 
   // ─── debounce / throttle search ───────────────────────────
   const debounceSearch = useDebounce(search, debounceWait, {
@@ -228,7 +242,9 @@ export function usePagination<
     totalPage,
     isLastPage,
     search,
+    searchAsync,
     refresh,
+    refreshAsync,
     debounceSearch,
     throttleSearch,
   }

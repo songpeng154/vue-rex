@@ -308,7 +308,7 @@ describe('usePagination watchSource', () => {
 })
 
 describe('usePagination search 返回值', () => {
-  it('search() 返回 promise，可以 await', async () => {
+  it('searchAsync() 返回 promise 数据，可以 await 拿到结果', async () => {
     let callCount = 0
 
     const service = async () => {
@@ -317,7 +317,7 @@ describe('usePagination search 返回值', () => {
       return { records: [{ id: 1, name: 'User 1' }], totalCount: 1 }
     }
 
-    const [{ search, list }] = withSetup(() =>
+    const [{ searchAsync, list }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: (data: any) => ({ list: data.records, total: data.totalCount }),
       }),
@@ -326,7 +326,7 @@ describe('usePagination search 返回值', () => {
     await asyncAwait(100)
     expect(callCount).toBe(1)
 
-    const result = await search()
+    const result = await searchAsync()
     expect(callCount).toBe(2)
     expect(result).toEqual({ list: [{ id: 1, name: 'User 1' }], total: 1 })
     expect(list.value).toHaveLength(1)

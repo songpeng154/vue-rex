@@ -238,14 +238,6 @@ export interface RequestOptions<
   ) => void
 
   /**
-   * 请求失败时是否抛出错误（reject promise）
-   * 默认 false，错误仅通过 onError 回调和 error 状态处理
-   * 设为 true 时，run() 返回 rejected promise，可配合 try/catch 或 Error Boundary 使用
-   * @default false
-   */
-  throwOnError?: boolean
-
-  /**
    * 最后执行，不管 service 成功失败都会执行
    * @param params 参数
    */
@@ -310,28 +302,38 @@ export interface RequestMethod<
   TFormatData = TSerialized,
 > {
   /**
-   * 手动触发 service 执行。异常通过 onError 反馈，或者 await run(...).catch() 捕获
+   * 手动触发 service 执行（静默模式）。异常通过 onError 反馈，不抛出异常。
    */
-  run: (...args: TParams) => Promise<Undefinable<TFormatData>>
+  run: (...args: TParams) => Promise<void>
+
+  /**
+   * 手动触发 service 执行（Promise 模式）。请求失败时抛出异常，支持 try/catch 捕获。
+   */
+  runAsync: (...args: TParams) => Promise<TFormatData>
 
   /**
    * 与 run 用法一致，带防抖
    */
   debounceRun: DebouncedFunction<
-    (...args: TParams) => Promise<Undefinable<TFormatData>>
+    (...args: TParams) => Promise<void>
   >
 
   /**
    * 与 run 用法一致，带节流
    */
   throttleRun: DebouncedFunction<
-    (...args: TParams) => Promise<Undefinable<TFormatData>>
+    (...args: TParams) => Promise<void>
   >
 
   /**
    * 使用上次的 params，重新调用 run
    */
-  refresh: () => Promise<Undefinable<TFormatData>>
+  refresh: () => Promise<void>
+
+  /**
+   * 使用上次的 params，重新调用 runAsync
+   */
+  refreshAsync: () => Promise<TFormatData>
 
   /**
    * 手动取消当前正在进行中的请求（伪取消）

@@ -33,7 +33,6 @@ export default function useCoreRequest<
     onError,
     onSuccess,
     onFinallyFetchDone,
-    throwOnError = false,
     dataSerializer,
     errorSerializer,
     formatData,
@@ -44,13 +43,15 @@ export default function useCoreRequest<
 
   const serviceWrapper = (...params: TParams): Promise<TData> => service(...params)
 
-  const coreRequest = async (...args: TParams): Promise<TFormatData | undefined> => {
+  const runAsync = async (...args: TParams): Promise<TFormatData> => {
+    if (!ready.value) return data.value as TFormatData
+
     setTimeout(() => onBefore?.(args), 0)
 
     const beforeReturn = runPluginHooks('onBefore', args)
     if (beforeReturn?.isReturned) {
       setState({ loading: false, finished: true })
-      return
+      return data.value as TFormatData
     }
 
     const currentCount = ++count
@@ -67,7 +68,7 @@ export default function useCoreRequest<
       }
 
       if (currentCount <= cancelledCount)
-        return data.value
+        return data.value as TFormatData
 
       const extracted = (dataSerializer ? dataSerializer(result, args) : result) as TSerialized
       const finalData = (formatData ? formatData(extracted, result, args) : extracted) as TFormatData
@@ -80,7 +81,7 @@ export default function useCoreRequest<
     }
     catch (e) {
       if (currentCount <= cancelledCount)
-        return data.value
+        return data.value as TFormatData
 
       const _e = errorSerializer ? errorSerializer(e, args) : e as TError
 
@@ -88,10 +89,7 @@ export default function useCoreRequest<
       onError?.(_e, args)
       runPluginHooks('onError', _e, args)
 
-      if (throwOnError)
-        return Promise.reject(e)
-
-      return data.value
+      throw _e
     }
     finally {
       onFinally?.(args)
@@ -99,14 +97,23 @@ export default function useCoreRequest<
     }
   }
 
-  const run = async (...args: TParams) => {
+  const run = async (...args: TParams): Promise<void> => {
     if (!ready.value) return
-    return coreRequest(...args)
+    try {
+      await runAsync(...args)
+    }
+    catch {
+      // 吞噬异常，不抛出
+    }
   }
 
   // 刷新
-  const refresh = () => {
+  const refresh = (): Promise<void> => {
     return run(...rawState.params)
+  }
+
+  const refreshAsync = (): Promise<TFormatData> => {
+    return runAsync(...rawState.params)
   }
 
   const cancel = () => {
@@ -122,18 +129,11 @@ export default function useCoreRequest<
     runPluginHooks('onMutate', data)
   }
 
-  // 始终以 reject 方式运行，不受 throwOnError 影响
-  const runForceReject = async (...args: TParams) => {
-    await coreRequest(...args)
-    if (rawState.error)
-      throw rawState.error
-  }
-
   // 乐观更新
   const optimisticUpdate = (newData: TFormatData | ((oldData: TFormatData) => TFormatData), params: TParams = rawState.params) => {
     const oldData = rawState.data
     mutate(newData)
-    runForceReject(...params).catch(() => {
+    runAsync(...params).catch(() => {
       if (oldData !== undefined)
         mutate(oldData)
     })
@@ -152,5 +152,5 @@ export default function useCoreRequest<
     trailing: throttleTrailing,
   })
 
-  return { run, refresh, cancel, mutate, optimisticUpdate, debounceRun, throttleRun }
+  return { run, runAsync, refresh, refreshAsync, cancel, mutate, optimisticUpdate, debounceRun, throttleRun }
 }

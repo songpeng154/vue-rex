@@ -72,19 +72,44 @@ describe('useRequest 手动执行', () => {
     expect(loading.value).toBe(false)
   })
 
-  it('run 手动触发执行', async () => {
+  it('run 手动触发执行 (静默模式，报错不抛异常)', async () => {
     const service = async () => {
       await asyncAwait(30)
-      return 'done'
+      throw new Error('fail')
     }
 
-    const [{ run, data }] = withSetup(() =>
+    const [{ run, error }] = withSetup(() =>
       useRequest(service, { manual: true }),
     )
 
+    // 不会抛错
     await run()
-    await asyncAwait(50)
-    expect(data.value).toBe('done')
+    expect(error.value).toBeInstanceOf(Error)
+  })
+
+  it('runAsync 手动触发执行 (Promise 模式，正确返回数据或抛出异常)', async () => {
+    const successService = async () => {
+      await asyncAwait(20)
+      return 'done-data'
+    }
+
+    const [{ runAsync }] = withSetup(() =>
+      useRequest(successService, { manual: true }),
+    )
+
+    const res = await runAsync()
+    expect(res).toBe('done-data')
+
+    const failService = async () => {
+      await asyncAwait(20)
+      throw new Error('async-fail')
+    }
+
+    const [{ runAsync: runAsyncFail }] = withSetup(() =>
+      useRequest(failService, { manual: true }),
+    )
+
+    await expect(runAsyncFail()).rejects.toThrow('async-fail')
   })
 
   it('refresh 使用上次参数重新请求', async () => {

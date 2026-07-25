@@ -23,28 +23,38 @@ export interface RequestMethod<
   TFormatData = TSerialized,
 > {
   /**
-   * 手动触发 service 执行。异常通过 onError 反馈，或者 await run(...).catch() 捕获
+   * 手动触发 service 执行（静默模式）。异常通过 onError 反馈，不抛出异常。
    */
-  run: (...args: TParams) => Promise<Undefinable<TFormatData>>
+  run: (...args: TParams) => Promise<void>
+
+  /**
+   * 手动触发 service 执行（Promise 模式）。请求失败时抛出异常，支持 try/catch 捕获。
+   */
+  runAsync: (...args: TParams) => Promise<TFormatData>
 
   /**
    * 与 run 用法一致，带防抖
    */
   debounceRun: DebouncedFunction<
-    (...args: TParams) => Promise<Undefinable<TFormatData>>
+    (...args: TParams) => Promise<void>
   >
 
   /**
    * 与 run 用法一致，带节流
    */
   throttleRun: DebouncedFunction<
-    (...args: TParams) => Promise<Undefinable<TFormatData>>
+    (...args: TParams) => Promise<void>
   >
 
   /**
    * 使用上次的 params，重新调用 run
    */
-  refresh: () => Promise<Undefinable<TFormatData>>
+  refresh: () => Promise<void>
+
+  /**
+   * 使用上次的 params，重新调用 runAsync
+   */
+  refreshAsync: () => Promise<TFormatData>
 
   /**
    * 手动取消当前正在进行中的请求（伪取消）
@@ -77,8 +87,8 @@ export interface RequestMethod<
 
 ### run
 
-手动触发 [service](request-service-fn) 执行，参数会传递给 [service](request-service-fn)。
-异常通过 [onError](./request-options#onError) 反馈或者使用 `run(...).catch()` 进行反馈。
+手动触发 [service](request-service-fn) 执行（静默模式），参数会传递给 [service](request-service-fn)。
+异常仅通过 [onError](./request-options#onError) 反馈，内部不会抛出 Promise 异常。
 
 #### 入参
 
@@ -88,7 +98,22 @@ export interface RequestMethod<
 
 #### 返回值
 
-`Promise<Undefinable<TFormatData>>`
+`Promise<void>`
+
+### runAsync
+
+手动触发 [service](request-service-fn) 执行（Promise 模式）。
+请求失败时会抛出异常，可使用 `try...catch` 或 `runAsync().catch()` 进行捕获并获取返回值。
+
+#### 入参
+
+| 名称        | 类型        | 默认值 | 描述   |
+|:----------|:----------|:----|:-----|
+| `...args` | `TParams` |     | 请求参数 |
+
+#### 返回值
+
+`Promise<TFormatData>`
 
 ### debounceRun
 
@@ -102,7 +127,7 @@ export interface RequestMethod<
 
 #### 返回值
 
-`Promise<Undefinable<TFormatData>>`
+`Promise<void>`
 
 ### throttleRun
 
@@ -116,15 +141,23 @@ export interface RequestMethod<
 
 #### 返回值
 
-`Promise<Undefinable<TFormatData>>`
+`Promise<void>`
 
 ### refresh
 
-使用上次的 `params`，重新调用 `run`
+使用上次的 `params`，重新调用 `run`（静默模式）
 
 #### 返回值
 
-`Promise<Undefinable<TFormatData>>`
+`Promise<void>`
+
+### refreshAsync
+
+使用上次的 `params`，重新调用 `runAsync`（Promise 模式）
+
+#### 返回值
+
+`Promise<TFormatData>`
 
 ### cancel
 

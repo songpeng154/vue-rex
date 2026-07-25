@@ -51,7 +51,7 @@ Global default plugins.
 ```ts
 import { createRequest, definePlugin } from 'vue-rex'
 
-const logPlugin = definePlugin((ctx) => ({
+const logPlugin = definePlugin(ctx => ({
   onBefore(params) {
     console.log('request start', params)
   },
@@ -112,7 +112,6 @@ Full configuration for `useApi(service, options)`:
 |:---|:---|:---|:---|
 | `errorRetryCount` | `MaybeRef<number>` | - | Error retry count, `Infinity` = unlimited |
 | `errorRetryInterval` | `MaybeRef<number>` | - | Retry interval (ms) |
-| `throwOnError` | `boolean` | `false` | Throw on error for try/catch usage |
 
 ### Polling
 
@@ -156,10 +155,12 @@ Full configuration for `useApi(service, options)`:
 | `loading` | `ComputedRef<boolean>` | Request in progress |
 | `finished` | `ComputedRef<boolean>` | Request completed |
 | `params` | `ComputedRef<TParams>` | Current request params |
-| `run` | `(...args) => Promise` | Manual trigger |
-| `debounceRun` | `(...args) => Promise` | Debounced run |
-| `throttleRun` | `(...args) => Promise` | Throttled run |
-| `refresh` | `() => Promise` | Re-run with last params |
+| `run` | `(...args) => Promise<void>` | Manual trigger (silent mode) |
+| `runAsync` | `(...args) => Promise<TFormatData>` | Manual trigger (Promise mode, throws on error) |
+| `debounceRun` | `(...args) => Promise<void>` | Debounced run |
+| `throttleRun` | `(...args) => Promise<void>` | Throttled run |
+| `refresh` | `() => Promise<void>` | Re-run with last params (silent mode) |
+| `refreshAsync` | `() => Promise<TFormatData>` | Re-run with last params (Promise mode) |
 | `cancel` | `() => void` | Cancel current request |
 | `mutate` | `(data \| fn) => void` | Directly modify data |
 | `optimisticUpdate` | `(data \| fn, params?) => void` | Optimistic update, auto-rollback on failure |

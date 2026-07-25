@@ -56,7 +56,7 @@ const useApi = createRequest({
 ```ts
 import { createRequest, definePlugin } from 'vue-rex'
 
-const logPlugin = definePlugin((ctx) => ({
+const logPlugin = definePlugin(ctx => ({
   onBefore(params) {
     console.log('请求开始', params)
   },
@@ -117,7 +117,6 @@ const useApi = createRequest({
 |:---|:---|:---|:---|
 | `errorRetryCount` | `MaybeRef<number>` | - | 错误重试次数，`Infinity` 无限重试 |
 | `errorRetryInterval` | `MaybeRef<number>` | - | 重试间隔(ms) |
-| `throwOnError` | `boolean` | `false` | 失败时是否 throw，可配合 try/catch 使用 |
 
 ### 轮询
 
@@ -161,10 +160,12 @@ const useApi = createRequest({
 | `loading` | `ComputedRef<boolean>` | 是否正在请求中 |
 | `finished` | `ComputedRef<boolean>` | 请求是否已完成 |
 | `params` | `ComputedRef<TParams>` | 当前请求参数 |
-| `run` | `(...args) => Promise` | 手动触发请求 |
-| `debounceRun` | `(...args) => Promise` | 带防抖的 run |
-| `throttleRun` | `(...args) => Promise` | 带节流的 run |
-| `refresh` | `() => Promise` | 用上次参数重新请求 |
+| `run` | `(...args) => Promise<void>` | 手动触发请求（静默模式，不抛错） |
+| `runAsync` | `(...args) => Promise<TFormatData>` | 手动触发请求（Promise 模式，抛错） |
+| `debounceRun` | `(...args) => Promise<void>` | 带防抖的 run |
+| `throttleRun` | `(...args) => Promise<void>` | 带节流的 run |
+| `refresh` | `() => Promise<void>` | 用上次参数重新请求（静默模式） |
+| `refreshAsync` | `() => Promise<TFormatData>` | 用上次参数重新请求（Promise 模式） |
 | `cancel` | `() => void` | 取消当前请求 |
 | `mutate` | `(data \| fn) => void` | 直接修改 data |
-| `optimisticUpdate` | `(data \| fn, params?) => void` | 乐观更新，失败自动回滚 |
+| `optimisticUpdate` | `(data \| fn, params?) => void` | 乐观更新，失败自动回退 |

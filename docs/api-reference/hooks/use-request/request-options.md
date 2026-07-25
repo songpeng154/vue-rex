@@ -221,14 +221,6 @@ export interface RequestOptions<
   ) => void
 
   /**
-   * 请求失败时是否抛出错误（reject promise）
-   * 默认 false，错误仅通过 onError 回调和 error 状态处理
-   * 设为 true 时，run() 返回 rejected promise，可配合 try/catch 或 Error Boundary 使用
-   * @default false
-   */
-  throwOnError?: boolean
-
-  /**
    * 最后执行，不管 service 成功失败都会执行
    * @param params 参数
    */
@@ -528,13 +520,6 @@ export interface RequestOptions<
 #### 返回值
 
 `void`
-
-### throwOnError
-
-* `可选` - `boolean`
-* 默认值：`false`
-
-请求失败时是否抛出错误（reject promise）。默认 false，错误仅通过 [onError](#onerror) 回调和 [error](request-state#error) 状态处理。设为 true 时，`run()` 返回 rejected promise，可配合 try/catch 或 Error Boundary 使用。
 
 ### onFinally
 

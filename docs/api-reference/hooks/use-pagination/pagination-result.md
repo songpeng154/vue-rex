@@ -11,8 +11,8 @@ outline: deep
 ## 类型声明
 
 ```typescript
-import { ComputedRef, Ref } from 'vue'
 import type { DebouncedFunction } from 'es-toolkit'
+import { ComputedRef, Ref } from 'vue'
 
 export interface PaginationResult<
   TData = any,
@@ -28,7 +28,7 @@ export interface PaginationResult<
       PaginationData<TFormatData>,
       TError
     >,
-    'params' | 'run' | 'debounceRun' | 'throttleRun' | 'refresh' | 'optimisticUpdate'
+    'params' | 'run' | 'runAsync' | 'debounceRun' | 'throttleRun' | 'refresh' | 'refreshAsync' | 'optimisticUpdate'
   > {
   /** 当前请求参数（已提交的搜索字段 + 当前 page / pageSize） */
   params: ComputedRef<TParams>
@@ -51,17 +51,23 @@ export interface PaginationResult<
   /** 是否已是最后一页 */
   isLastPage: ComputedRef<boolean>
 
-  /** 搜索：提交搜索条件 + page 归 1 + 触发请求 */
-  search: (params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>
+  /** 搜索（静默模式）：提交搜索条件 + page 归 1 + 触发请求 */
+  search: (params?: TParams) => Promise<void>
+
+  /** 搜索（Promise 模式）：提交搜索条件 + page 归 1 + 触发请求，失败抛出异常 */
+  searchAsync: (params?: TParams) => Promise<PaginationData<TFormatData>>
 
   /** 防抖版 search */
-  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>>
+  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
 
   /** 节流版 search */
-  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<Undefinable<PaginationData<TFormatData>>>>
+  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
 
-  /** 使用当前参数重新请求 */
-  refresh: () => Promise<Undefinable<PaginationData<TFormatData>>>
+  /** 使用当前参数重新请求（静默模式） */
+  refresh: () => Promise<void>
+
+  /** 使用当前参数重新请求（Promise 模式） */
+  refreshAsync: () => Promise<PaginationData<TFormatData>>
 
   /** 乐观更新 */
   optimisticUpdate: (
@@ -128,7 +134,8 @@ export interface PaginationResult<
 
 ### search
 
-提交搜索条件 + page 归 1 + 触发请求。无参时提交 params ref 中的当前表单值；传参时先写入 params ref 再提交。
+提交搜索条件 + page 归 1 + 触发请求（静默模式）。无参时提交 params ref 中的当前表单值；传参时先写入 params ref 再提交。
+内部捕获异常，不会抛出 Promise 错误。
 
 #### 入参
 
@@ -138,7 +145,22 @@ export interface PaginationResult<
 
 #### 返回值
 
-`Promise<Undefinable<PaginationData<TFormatData>>>`
+`Promise<void>`
+
+### searchAsync
+
+提交搜索条件 + page 归 1 + 触发请求（Promise 模式）。
+失败时抛出异常，可使用 `try...catch` 进行捕获并获取处理后的分页结果。
+
+#### 入参
+
+| 名称       | 类型        | 默认值 | 描述   |
+|:---------|:----------|:----|:-----|
+| `params` | `TParams` | 可选 | 搜索参数，写入表单 ref 后提交 |
+
+#### 返回值
+
+`Promise<PaginationData<TFormatData>>`
 
 ### debounceSearch
 
@@ -150,11 +172,19 @@ export interface PaginationResult<
 
 ### refresh
 
-使用当前参数重新请求
+使用当前参数重新请求（静默模式）
 
 #### 返回值
 
-`Promise<Undefinable<PaginationData<TFormatData>>>`
+`Promise<void>`
+
+### refreshAsync
+
+使用当前参数重新请求（Promise 模式）
+
+#### 返回值
+
+`Promise<PaginationData<TFormatData>>`
 
 ### optimisticUpdate
 
