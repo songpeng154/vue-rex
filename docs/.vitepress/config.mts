@@ -5,11 +5,14 @@ import { setupContainerDemo } from './container/demo'
 
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
+const isVercel = Boolean(process.env.VERCEL)
+const basePath = isVercel ? '/' : '/vue-rex/'
+
 export default defineConfig({
-  base: '/vue-rex/',
+  base: basePath,
   cleanUrls: true,
   head: [
-    ['link', { rel: 'icon', href: '/vue-rex/favicon.ico' }],
+    ['link', { rel: 'icon', href: `${basePath}favicon.ico` }],
   ],
   markdown: {
     theme: {

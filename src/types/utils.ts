@@ -23,14 +23,14 @@ export type WrapWithComputed<T extends Recordable> = {
 // ─── 点号路径类型工具 ─────────────────────────────────────────
 
 /** 将点号路径字符串拆分为元组：'a.b.c' → ['a', 'b', 'c'] */
-export type SplitPath<S extends string, Acc extends string[] = []> =
-  S extends `${infer Head}.${infer Tail}`
+export type SplitPath<S extends string, Acc extends string[] = []>
+  = S extends `${infer Head}.${infer Tail}`
     ? SplitPath<Tail, [...Acc, Head]>
     : [...Acc, S]
 
 /** 按元组路径从 T 中取值 */
-export type PathValueByTuple<T, Keys extends readonly string[]> =
-  Keys extends readonly [infer First, ...infer Rest]
+export type PathValueByTuple<T, Keys extends readonly string[]>
+  = Keys extends readonly [infer First, ...infer Rest]
     ? First extends keyof T
       ? Rest extends readonly string[]
         ? PathValueByTuple<T[First], Rest>

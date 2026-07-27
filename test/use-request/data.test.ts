@@ -1,7 +1,7 @@
+import type { ApiResponse, UserInfo } from './helpers.ts'
 import { describe, expect, it } from 'vitest'
 import { useRequest } from '../../src/hooks'
 import { asyncAwait, withSetup } from '../utils.ts'
-import { ApiResponse, UserInfo } from './helpers.ts'
 
 describe('useRequest 数据突变', () => {
   it('mutate 直接修改 data', async () => {

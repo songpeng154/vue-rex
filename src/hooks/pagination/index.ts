@@ -58,7 +58,7 @@ export function usePagination<
     [pageSizeField]: initialPageSize,
   })) as Ref<Record<string, any>>
 
-  // ─── committed：上次 search() 提交的完整 params 快照 ────────
+  // ─── committed：上次 reload() 提交的完整 params 快照 ────────
   const committed = ref({ ...paramsRef.value })
 
   // ─── page / pageSize：computed 代理，读写落在 paramsRef 上 ──
@@ -181,19 +181,19 @@ export function usePagination<
   if (watchSource && watchSource !== true)
     watch(watchSource, doRequest, { deep: watchDeep })
 
-  // ─── search ───────────────────────────────────────────────
-  const search = (searchParams?: TParams) => {
-    if (searchParams)
-      Object.assign(paramsRef.value, searchParams)
+  // ─── reload ───────────────────────────────────────────────
+  const reload = (reloadParams?: TParams) => {
+    if (reloadParams)
+      Object.assign(paramsRef.value, reloadParams)
     suppressWatch = true
     committed.value = { ...paramsRef.value }
     page.value = 1
     return doRequest()
   }
 
-  const searchAsync = (searchParams?: TParams) => {
-    if (searchParams)
-      Object.assign(paramsRef.value, searchParams)
+  const reloadAsync = (reloadParams?: TParams) => {
+    if (reloadParams)
+      Object.assign(paramsRef.value, reloadParams)
     suppressWatch = true
     committed.value = { ...paramsRef.value }
     page.value = 1
@@ -204,14 +204,14 @@ export function usePagination<
   const refresh = () => fetchInstance.run(requestParams.value)
   const refreshAsync = () => fetchInstance.runAsync(requestParams.value)
 
-  // ─── debounce / throttle search ───────────────────────────
-  const debounceSearch = useDebounce(search, debounceWait, {
+  // ─── debounce / throttle reload ───────────────────────────
+  const debounceReload = useDebounce(reload, debounceWait, {
     maxWait: debounceMaxWait,
     leading: debounceLeading,
     trailing: debounceTrailing,
   })
 
-  const throttleSearch = useThrottle(search, throttleWait, {
+  const throttleReload = useThrottle(reload, throttleWait, {
     leading: throttleLeading,
     trailing: throttleTrailing,
   })
@@ -241,11 +241,11 @@ export function usePagination<
     total,
     totalPage,
     isLastPage,
-    search,
-    searchAsync,
+    reload,
+    reloadAsync,
     refresh,
     refreshAsync,
-    debounceSearch,
-    throttleSearch,
+    debounceReload,
+    throttleReload,
   }
 }

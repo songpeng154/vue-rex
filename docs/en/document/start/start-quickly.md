@@ -47,8 +47,12 @@ const { data, loading, error } = useApi(getUserList)
 
 <template>
   <div>
-    <div v-if="loading">Loading...</div>
-    <div v-if="error">Error: {{ error.message }}</div>
+    <div v-if="loading">
+      Loading...
+    </div>
+    <div v-if="error">
+      Error: {{ error.message }}
+    </div>
     <div v-if="data">
       <div v-for="user in data" :key="user.id">
         {{ user.name }}
@@ -69,7 +73,7 @@ const usePage = createPagination({
   totalKey: 'data.total',
 })
 
-const getUserPage = async (params: { page: number; pageSize: number }) => {
+const getUserPage = async (params: { page: number, pageSize: number }) => {
   const res = await fetch(`/api/users?page=${params.page}&size=${params.pageSize}`)
   return res.json()
 }

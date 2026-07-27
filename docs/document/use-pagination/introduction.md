@@ -17,10 +17,10 @@ const usePage = createPagination({
   totalKey: 'data.total',
 })
 
-interface User { id: number; name: string }
+interface User { id: number, name: string }
 
-const getUsers = (params: { page: number; pageSize: number }) =>
-  server.get<{ data: { list: User[]; total: number } }>('/api/users', { params })
+const getUsers = (params: { page: number, pageSize: number }) =>
+  server.get<{ data: { list: User[], total: number } }>('/api/users', { params })
 
 const { list, total, page, pageSize, totalPage, isLastPage } = usePage(getUsers)
 ```
@@ -43,7 +43,7 @@ const usePage = createPagination({
 })
 
 // service 收到的 params 里是 current / size
-const getUsers = (params: { current: number; size: number }) =>
+const getUsers = (params: { current: number, size: number }) =>
   server.get('/api/users', { params })
 ```
 
@@ -51,25 +51,25 @@ const getUsers = (params: { current: number; size: number }) =>
 use-pagination/pagination-fields
 :::
 
-## 搜索 + 分页
+## 筛选 / 提交 + 分页
 
-传入 `params` ref 作为表单模型，`search()` 提交搜索条件并自动回到第一页：
+传入 `params` ref 作为表单模型，`reload()` 提交参数并自动回到第一页：
 
 ```typescript
 const searchParams = ref({ page: 1, pageSize: 10, keyword: '' })
 
-const { list, page, search } = usePage(getUsers, {
+const { list, page, reload } = usePage(getUsers, {
   params: searchParams,
 })
 
-// 搜索：提交表单当前值 + page 归 1 + 发请求
-const onSearch = () => search()
+// 提交：提交表单当前值 + page 归 1 + 发请求
+const onReload = () => reload()
 
 // 也可以显式传参（会写入表单 ref 再提交）
-search({ keyword: 'abc' })
+reload({ keyword: 'abc' })
 ```
 
-翻页时使用的是上次 `search()` 提交的搜索条件，表单中未提交的改动不会影响分页请求。
+翻页时使用的是上次 `reload()` 提交的参数，表单中未提交的改动不会影响分页请求。
 
 ::: demo
 use-pagination/search-with-pagination
@@ -81,7 +81,7 @@ use-pagination/search-with-pagination
 
 ```typescript
 const { list } = usePage(getUsers, {
-  formatList: (list) =>
+  formatList: list =>
     list.map(item => ({
       ...item,
       fullName: `${item.lastName}${item.firstName}`,
@@ -127,7 +127,7 @@ use-pagination/format-list
 | `pageSize` | `Ref<number>` | 每页条数（可写，代理到 params ref） |
 | `totalPage` | `ComputedRef<number>` | 总页数 |
 | `isLastPage` | `ComputedRef<boolean>` | 是否最后一页 |
-| `search` | `(params?: TParams) => Promise` | 提交搜索条件 + page 归 1 + 发请求 |
-| `debounceSearch` | `DebouncedFunction` | 防抖版 search |
-| `throttleSearch` | `DebouncedFunction` | 节流版 search |
+| `reload` | `(params?: TParams) => Promise` | 提交参数 + page 归 1 + 发请求 |
+| `debounceReload` | `DebouncedFunction` | 防抖版 reload |
+| `throttleReload` | `DebouncedFunction` | 节流版 reload |
 | `refresh` | `() => Promise` | 用当前参数重新请求 |

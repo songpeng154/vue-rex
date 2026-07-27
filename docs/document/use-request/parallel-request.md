@@ -7,8 +7,8 @@ outline: deep
 一次 `useApi` 调用，通过 `run` 传入不同参数同时发起多个请求，配合 `onSuccess` 将结果收集到各自的位置。
 
 ```typescript
-import { createRequest } from 'vue-rex'
 import { reactive } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 

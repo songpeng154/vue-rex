@@ -36,7 +36,6 @@ export interface GlobalConfigProvider<
    */
   plugins?: RequestPluginImplement<TData, TParams, TFormatData, TRawData>[]
 }
-
 ```
 
 ## 泛型

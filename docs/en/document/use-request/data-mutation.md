@@ -15,7 +15,7 @@ const { data, mutate } = useApi(fetchList)
 mutate([...data.value, newItem])
 
 // Or use a function
-mutate((prevData) => prevData.filter(item => item.id !== 100))
+mutate(prevData => prevData.filter(item => item.id !== 100))
 ```
 
 ::: demo
@@ -29,7 +29,7 @@ Optimistic update immediately updates the UI and sends a request in the backgrou
 ```typescript
 const { optimisticUpdate } = useApi(updateService)
 
-optimisticUpdate((prevData) => ({ ...prevData, name: 'new name' }))
+optimisticUpdate(prevData => ({ ...prevData, name: 'new name' }))
 ```
 
 ::: demo

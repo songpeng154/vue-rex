@@ -17,15 +17,23 @@ const { data, loading, run, refresh } = useApi(getTime, {
 
 <template>
   <div>
-    <div v-if="loading" class="state-box loading">⏳ 加载中...</div>
+    <div v-if="loading" class="state-box loading">
+      ⏳ 加载中...
+    </div>
     <div v-else class="state-box success">
       <p>{{ data }}</p>
     </div>
     <div class="actions">
-      <button @click="run(Date.now())">带新参数执行</button>
-      <button class="secondary" @click="refresh()">刷新（使用上次参数）</button>
+      <button @click="run(Date.now())">
+        带新参数执行
+      </button>
+      <button class="secondary" @click="refresh()">
+        刷新（使用上次参数）
+      </button>
     </div>
-    <p class="hint">refresh 用上次参数重新请求；run 需要传入新参数</p>
+    <p class="hint">
+      refresh 用上次参数重新请求；run 需要传入新参数
+    </p>
   </div>
 </template>
 

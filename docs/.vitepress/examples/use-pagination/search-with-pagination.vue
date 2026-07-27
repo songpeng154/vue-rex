@@ -14,7 +14,7 @@ interface User {
 }
 
 // 模拟后端：支持 keyword 搜索 + 分页
-const getUsers = async (params: { page: number; pageSize: number; keyword?: string }) => {
+const getUsers = async (params: { page: number, pageSize: number, keyword?: string }) => {
   await new Promise(resolve => setTimeout(resolve, 600))
   const all: User[] = Array.from({ length: 50 }, (_, i) => ({
     id: i + 1,
@@ -32,26 +32,30 @@ const getUsers = async (params: { page: number; pageSize: number; keyword?: stri
 
 const searchParams = ref({ page: 1, pageSize: 5, keyword: '' })
 
-const { list, loading, page, pageSize, total, totalPage, search } = usePage(getUsers, {
+const { list, loading, page, total, totalPage, reload } = usePage(getUsers, {
   params: searchParams,
 })
 
-// 搜索：提交表单条件 + page 归 1 + 发请求
-const onSearch = () => search()
+// 提交筛选/搜索条件 + page 归 1 + 发请求
+const onSearch = () => reload()
 
-// 重置：清空关键词 + 重新搜索
+// 重置：清空关键词 + 重新加载
 const onReset = () => {
   searchParams.value.keyword = ''
-  search()
+  reload()
 }
 </script>
 
 <template>
   <div>
     <div class="search-bar">
-      <input v-model="searchParams.keyword" placeholder="搜索用户名" @keyup.enter="onSearch" />
-      <button class="primary" @click="onSearch">搜索</button>
-      <button @click="onReset">重置</button>
+      <input v-model="searchParams.keyword" placeholder="搜索用户名" @keyup.enter="onSearch">
+      <button class="primary" @click="onSearch">
+        搜索
+      </button>
+      <button @click="onReset">
+        重置
+      </button>
     </div>
 
     <table>
@@ -62,20 +66,30 @@ const onReset = () => {
         <tr v-for="user in list" :key="user.id">
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
-          <td :class="user.status === '禁用' ? 'disabled' : 'active'">{{ user.status }}</td>
+          <td :class="user.status === '禁用' ? 'disabled' : 'active'">
+            {{ user.status }}
+          </td>
         </tr>
       </tbody>
     </table>
-    <div v-if="loading" class="loading-row">⏳ 加载中...</div>
+    <div v-if="loading" class="loading-row">
+      ⏳ 加载中...
+    </div>
 
     <div class="pager">
       <span>第 {{ page }} / {{ totalPage }} 页，共 {{ total }} 条</span>
       <div class="btns">
-        <button :disabled="page === 1" @click="page--">上一页</button>
-        <button :disabled="page >= totalPage" @click="page++">下一页</button>
+        <button :disabled="page === 1" @click="page--">
+          上一页
+        </button>
+        <button :disabled="page >= totalPage" @click="page++">
+          下一页
+        </button>
       </div>
     </div>
-    <p class="hint">search() 提交表单搜索条件并自动回到第一页，翻页时保留已提交的搜索条件</p>
+    <p class="hint">
+      reload() 提交表单条件并自动回到第一页，翻页时保留已提交的筛选条件
+    </p>
   </div>
 </template>
 

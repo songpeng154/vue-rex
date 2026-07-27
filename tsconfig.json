@@ -13,6 +13,7 @@
     ],
     "types": ["node"],
     "allowImportingTsExtensions": true,
+    "allowJs": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -21,8 +22,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "allowJs": true
+    "skipLibCheck": true
   },
   "include": [
     "./src/**/*.ts",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { clearCache, createRequest } from 'vue-rex'
 import { defineComponent, h, ref } from 'vue'
+import { clearCache, createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -27,11 +27,9 @@ const UserListComp = defineComponent(() => {
   })
   return () => {
     if (!data.value) return h('span', '加载中...')
-    return h('ul', { style: 'margin:0;padding-left:20px' },
-      (data.value as User[]).map(user =>
-        h('li', { style: 'margin-bottom:4px' }, `${user.id}. ${user.name}`)
-      )
-    )
+    return h('ul', { style: 'margin:0;padding-left:20px' }, (data.value as User[]).map(user =>
+      h('li', { style: 'margin-bottom:4px' }, `${user.id}. ${user.name}`),
+    ))
   }
 })
 </script>

@@ -21,10 +21,11 @@ export const setupContainerDemo = (md: MarkdownIt) => {
         componentSrc = arr[0]
         runOnlineUrl = arr[1]
 
-        const sourceCode = fs.readFileSync(path.resolve(__dirname, `../../examples/${ componentSrc }.vue`), 'utf8')
+        const sourceCode = fs.readFileSync(path.resolve(__dirname, `../../examples/${componentSrc}.vue`), 'utf8')
 
-        return `<Demo run-url="${ runOnlineUrl }" path="${ componentSrc }.vue" source-code="${ encodeURIComponent(sourceCode) }">`
-      } else
+        return `<Demo run-url="${runOnlineUrl}" path="${componentSrc}.vue" source-code="${encodeURIComponent(sourceCode)}">`
+      }
+      else
         return '</Demo>'
     },
   })

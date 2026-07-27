@@ -26,12 +26,16 @@ const { data, loading, optimisticUpdate } = useApi(toggleLike, {
       </span>
     </div>
     <div class="actions">
-      <button @click="optimisticUpdate(true, [true])">点赞（模拟成功）</button>
+      <button @click="optimisticUpdate(true, [true])">
+        点赞（模拟成功）
+      </button>
       <button class="fail" @click="optimisticUpdate(true, [1])">
         点赞（模拟失败，自动回滚）
       </button>
     </div>
-    <p class="hint">第二个按钮传入错误类型，请求失败后 UI 自动回滚到之前的状态</p>
+    <p class="hint">
+      第二个按钮传入错误类型，请求失败后 UI 自动回滚到之前的状态
+    </p>
   </div>
 </template>
 

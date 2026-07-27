@@ -15,7 +15,7 @@ const { data, mutate } = useApi(fetchList)
 mutate([...data.value, newItem])
 
 // 或使用函数形式更新
-mutate((prevData) => prevData.filter(item => item.id !== 100))
+mutate(prevData => prevData.filter(item => item.id !== 100))
 ```
 
 ::: demo
@@ -30,7 +30,7 @@ use-request/mutate
 const { optimisticUpdate } = useApi(updateService)
 
 // 立即更新 UI，后台发起请求
-optimisticUpdate((prevData) => ({ ...prevData, name: 'new name' }))
+optimisticUpdate(prevData => ({ ...prevData, name: 'new name' }))
 ```
 
 ::: demo

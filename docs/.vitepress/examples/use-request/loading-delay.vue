@@ -26,22 +26,26 @@ const run = () => {
 
 <template>
   <div>
-    <p class="desc">接口仅需 200ms，左边 loading 一闪而过，右边设置了 300ms 延迟就不会闪</p>
+    <p class="desc">
+      接口仅需 200ms，左边 loading 一闪而过，右边设置了 300ms 延迟就不会闪
+    </p>
     <div class="compare">
       <div class="col">
         <h4>无延迟</h4>
-        <div :class="['box', loading1 ? 'loading' : 'ok']">
-          {{ loading1 ? '⚡ 闪烁中...' : '✅ ' + data1 }}
+        <div class="box" :class="[loading1 ? 'loading' : 'ok']">
+          {{ loading1 ? '⚡ 闪烁中...' : `✅ ${data1}` }}
         </div>
       </div>
       <div class="col">
         <h4>delay = 300ms</h4>
-        <div :class="['box', loading2 ? 'loading' : 'ok']">
-          {{ loading2 ? '等待中...' : '✅ ' + data2 }}
+        <div class="box" :class="[loading2 ? 'loading' : 'ok']">
+          {{ loading2 ? '等待中...' : `✅ ${data2}` }}
         </div>
       </div>
     </div>
-    <button @click="run">重新执行</button>
+    <button @click="run">
+      重新执行
+    </button>
   </div>
 </template>
 

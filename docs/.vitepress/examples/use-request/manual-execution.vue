@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -40,11 +40,17 @@ const handleSearch = () => {
         placeholder="输入姓名搜索"
         @keyup.enter="handleSearch"
       >
-      <button @click="handleSearch">搜索</button>
+      <button @click="handleSearch">
+        搜索
+      </button>
     </div>
-    <p class="hint">可查询：张三、李四、王五</p>
+    <p class="hint">
+      可查询：张三、李四、王五
+    </p>
 
-    <div v-if="loading" class="state-box loading">⏳ 搜索中...</div>
+    <div v-if="loading" class="state-box loading">
+      ⏳ 搜索中...
+    </div>
 
     <div v-else-if="data" class="state-box success">
       <template v-if="data.length">
@@ -55,7 +61,9 @@ const handleSearch = () => {
         </ul>
       </template>
       <template v-else>
-        <p class="empty">未找到匹配用户</p>
+        <p class="empty">
+          未找到匹配用户
+        </p>
       </template>
     </div>
 

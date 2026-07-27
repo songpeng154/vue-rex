@@ -23,22 +23,26 @@ const run = () => { run1(); run2() }
 
 <template>
   <div>
-    <p class="desc">接口 200ms 就完成了，左边 loading 瞬间消失。右边设置 keep=600ms，可以给用户足够的反馈时间</p>
+    <p class="desc">
+      接口 200ms 就完成了，左边 loading 瞬间消失。右边设置 keep=600ms，可以给用户足够的反馈时间
+    </p>
     <div class="compare">
       <div class="col">
         <h4>无 keep</h4>
-        <div :class="['box', loading1 ? 'loading' : 'ok']">
-          {{ loading1 ? '⚡ 一闪而过' : '✅ ' + data1 }}
+        <div class="box" :class="[loading1 ? 'loading' : 'ok']">
+          {{ loading1 ? '⚡ 一闪而过' : `✅ ${data1}` }}
         </div>
       </div>
       <div class="col">
         <h4>keep = 600ms</h4>
-        <div :class="['box', loading2 ? 'loading' : 'ok']">
-          {{ loading2 ? '⏳ 加载中...' : '✅ ' + data2 }}
+        <div class="box" :class="[loading2 ? 'loading' : 'ok']">
+          {{ loading2 ? '⏳ 加载中...' : `✅ ${data2}` }}
         </div>
       </div>
     </div>
-    <button @click="run">重新执行</button>
+    <button @click="run">
+      重新执行
+    </button>
   </div>
 </template>
 

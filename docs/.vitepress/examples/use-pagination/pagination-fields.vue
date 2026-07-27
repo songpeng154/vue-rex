@@ -15,7 +15,7 @@ interface User {
 }
 
 // service 收到的 params 里是 current / size，不是 page / pageSize
-const getUsers = async (params: { current: number; size: number }) => {
+const getUsers = async (params: { current: number, size: number }) => {
   await new Promise(resolve => setTimeout(resolve, 800))
   const total = 30
   const list: User[] = Array.from({ length: params.size }, (_, i) => {
@@ -42,16 +42,24 @@ const { list, loading, page, pageSize, total, totalPage } = usePage(getUsers)
         </tr>
       </tbody>
     </table>
-    <div v-if="loading" class="loading-row">⏳ 加载中...</div>
+    <div v-if="loading" class="loading-row">
+      ⏳ 加载中...
+    </div>
 
     <div class="pager">
       <span>第 {{ page }} / {{ totalPage }} 页，共 {{ total }} 条</span>
       <div class="btns">
-        <button :disabled="page === 1" @click="page--">上一页</button>
-        <button :disabled="page >= totalPage" @click="page++">下一页</button>
+        <button :disabled="page === 1" @click="page--">
+          上一页
+        </button>
+        <button :disabled="page >= totalPage" @click="page++">
+          下一页
+        </button>
       </div>
     </div>
-    <p class="hint">paginationFields: { page: 'current', pageSize: 'size' }，内部 page ref 自动映射为 current 传给 service</p>
+    <p class="hint">
+      paginationFields: { page: 'current', pageSize: 'size' }，内部 page ref 自动映射为 current 传给 service
+    </p>
   </div>
 </template>
 

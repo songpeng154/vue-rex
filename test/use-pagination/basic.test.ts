@@ -315,7 +315,7 @@ describe('usePagination params 类型', () => {
     expect(capturedParams).toEqual({ current: 2, size: 10 })
   })
 
-  it('search 提交搜索字段并将 page 归 1', async () => {
+  it('reload 提交筛选字段并将 page 归 1', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword?: string }) => {
@@ -323,7 +323,7 @@ describe('usePagination params 类型', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, search }] = withSetup(() =>
+    const [{ page, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
       }),
@@ -336,13 +336,13 @@ describe('usePagination params 类型', () => {
     await asyncAwait(100)
     expect(capturedParams).toEqual({ page: 2, pageSize: 10 })
 
-    search({ keyword: 'test' } as any)
+    reload({ keyword: 'test' } as any)
     await asyncAwait(100)
     expect(capturedParams).toEqual({ page: 1, pageSize: 10, keyword: 'test' })
     expect(page.value).toBe(1)
   })
 
-  it('search 无参时提交 params ref 当前表单值', async () => {
+  it('reload 无参时提交 params ref 当前表单值', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword?: string }) => {
@@ -352,7 +352,7 @@ describe('usePagination params 类型', () => {
 
     const formRef = ref({ page: 1, pageSize: 10, keyword: '' })
 
-    const [{ search }] = withSetup(() =>
+    const [{ reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         params: formRef,
@@ -363,12 +363,12 @@ describe('usePagination params 类型', () => {
     expect(capturedParams).toEqual({ page: 1, pageSize: 10, keyword: '' })
 
     formRef.value.keyword = 'hello'
-    search()
+    reload()
     await asyncAwait(100)
     expect(capturedParams).toEqual({ page: 1, pageSize: 10, keyword: 'hello' })
   })
 
-  it('翻页时保留已提交的搜索字段', async () => {
+  it('翻页时保留已提交的筛选字段', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword?: string }) => {
@@ -376,7 +376,7 @@ describe('usePagination params 类型', () => {
       return { list: [] as UserItem[], total: 100 }
     }
 
-    const [{ page, search }] = withSetup(() =>
+    const [{ page, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 100 }),
       }),
@@ -385,7 +385,7 @@ describe('usePagination params 类型', () => {
     await asyncAwait(100)
     expect(capturedParams).toEqual({ page: 1, pageSize: 10 })
 
-    search({ keyword: 'test' } as any)
+    reload({ keyword: 'test' } as any)
     await asyncAwait(100)
     expect(capturedParams).toEqual({ page: 1, pageSize: 10, keyword: 'test' })
 
@@ -404,7 +404,7 @@ describe('usePagination params 类型', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ page, refresh, search }] = withSetup(() =>
+    const [{ page, refresh, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
       }),
@@ -413,7 +413,7 @@ describe('usePagination params 类型', () => {
     await asyncAwait(100)
     expect(callCount).toBe(1)
 
-    search({ keyword: 'foo' } as any)
+    reload({ keyword: 'foo' } as any)
     await asyncAwait(100)
     expect(callCount).toBe(2)
 
@@ -432,7 +432,7 @@ describe('usePagination params 类型', () => {
       return { list: [] as UserItem[], total: 0 }
     }
 
-    const [{ search }] = withSetup(() =>
+    const [{ reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         manual: true,
@@ -442,7 +442,7 @@ describe('usePagination params 类型', () => {
     await asyncAwait(100)
     expect(callCount).toBe(0)
 
-    search()
+    reload()
     await asyncAwait(100)
     expect(callCount).toBe(1)
   })

@@ -37,8 +37,8 @@ In practice, `loadingDelay` and `loadingKeep` are often used together: `loadingD
 
 ```typescript
 const { loading } = useApi(service, {
-  loadingDelay: 200,  // don't show loading for requests under 200ms
-  loadingKeep: 500,   // loading lasts at least 500ms
+  loadingDelay: 200, // don't show loading for requests under 200ms
+  loadingKeep: 500, // loading lasts at least 500ms
 })
 ```
 

@@ -12,8 +12,8 @@ PaginationServiceFn 即 [RequestServiceFn<TData, [TParams]>](../use-request/requ
 其中 `TParams` 是分页参数对象。
 
 ```typescript
-type PaginationServiceFn<TData = any, TParams extends Record<string, any> = Record<string, any>> =
-  (...args: [TParams]) => Promise<TData>
+type PaginationServiceFn<TData = any, TParams extends Record<string, any> = Record<string, any>>
+  = (...args: [TParams]) => Promise<TData>
 ```
 
 ## 示例
@@ -25,7 +25,7 @@ const usePage = createPagination({
 })
 
 const { list, total } = usePage(
-  (params: { page: number; size: number }) => fetch('/api/list', params)
+  (params: { page: number, size: number }) => fetch('/api/list', params)
 )
 ```
 

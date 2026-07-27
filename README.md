@@ -76,7 +76,7 @@ const usePage = createPagination({
 })
 
 // 组件中使用
-const getUserPage = async (params: { page: number; pageSize: number }) => {
+const getUserPage = async (params: { page: number, pageSize: number }) => {
   const res = await fetch(`/api/users?page=${params.page}&size=${params.pageSize}`)
   return res.json()
 }

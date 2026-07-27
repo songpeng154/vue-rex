@@ -41,7 +41,7 @@ export interface PaginationOptions<
   /**
    * 表单参数 ref，包含搜索字段和分页字段（page / pageSize）
    * hook 会在此 ref 上建立 page / pageSize 的 computed 代理，
-   * 搜索字段通过 search() 提交后才会用于请求
+   * 筛选字段通过 reload() 提交后才会用于请求
    *
    * 不传时 hook 内部自建，仅含 page / pageSize
    */
@@ -110,7 +110,7 @@ export interface PaginationResult<
     >,
     'params' | 'run' | 'runAsync' | 'debounceRun' | 'throttleRun' | 'refresh' | 'refreshAsync' | 'optimisticUpdate'
   > {
-  /** 当前请求参数（已提交的搜索字段 + 当前 page / pageSize） */
+  /** 当前请求参数（已提交的筛选字段 + 当前 page / pageSize） */
   params: ComputedRef<TParams>
 
   /** 当前列表数据 */
@@ -132,22 +132,22 @@ export interface PaginationResult<
   isLastPage: ComputedRef<boolean>
 
   /**
-   * 搜索：提交搜索条件 + page 归 1 + 触发请求（静默模式）
+   * 重新加载：提交参数 + page 归 1 + 触发请求（静默模式）
    * - 无参：提交 params ref 中的当前表单值
    * - 传参：先写入 params ref，再提交
    */
-  search: (params?: TParams) => Promise<void>
+  reload: (params?: TParams) => Promise<void>
 
   /**
-   * 搜索（Promise 模式）：提交搜索条件 + page 归 1 + 触发请求。请求失败抛出异常
+   * 重新加载（Promise 模式）：提交参数 + page 归 1 + 触发请求。请求失败抛出异常
    */
-  searchAsync: (params?: TParams) => Promise<PaginationData<TFormatData>>
+  reloadAsync: (params?: TParams) => Promise<PaginationData<TFormatData>>
 
-  /** 与 search 用法一致，带防抖 */
-  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
+  /** 与 reload 用法一致，带防抖 */
+  debounceReload: DebouncedFunction<(params?: TParams) => Promise<void>>
 
-  /** 与 search 用法一致，带节流 */
-  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
+  /** 与 reload 用法一致，带节流 */
+  throttleReload: DebouncedFunction<(params?: TParams) => Promise<void>>
 
   /** 使用当前参数重新请求（静默模式） */
   refresh: () => Promise<void>

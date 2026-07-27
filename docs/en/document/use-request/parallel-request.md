@@ -7,8 +7,8 @@ outline: deep
 A single `useApi` call, using `run` with different params to fire multiple requests in parallel. Use `onSuccess` to collect results into separate keys.
 
 ```typescript
-import { createRequest } from 'vue-rex'
 import { reactive } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 

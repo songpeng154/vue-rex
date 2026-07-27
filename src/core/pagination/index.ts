@@ -40,7 +40,7 @@ import { usePagination } from '../../hooks'
  *
  * // 组件里 — 自动推导，无需泛型
  * const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
- * const { list, page, search } = usePage(getUserList, { params: searchParams })
+ * const { list, page, reload } = usePage(getUserList, { params: searchParams })
  */
 export function createPagination<
   TListKey extends string,

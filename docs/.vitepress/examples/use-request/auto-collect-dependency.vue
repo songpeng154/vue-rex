@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -53,7 +53,9 @@ const { data, loading } = useApi(() => getFrameworkLibs(type.value), {
     <div v-else-if="data" class="state-box success">
       <h3>{{ data.name }}</h3>
       <ul>
-        <li v-for="lib in data.libs" :key="lib">{{ lib }}</li>
+        <li v-for="lib in data.libs" :key="lib">
+          {{ lib }}
+        </li>
       </ul>
     </div>
   </div>

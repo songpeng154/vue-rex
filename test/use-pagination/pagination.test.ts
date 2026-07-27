@@ -64,8 +64,8 @@ describe('usePagination 翻页', () => {
   })
 })
 
-describe('usePagination search', () => {
-  it('search() 提交表单搜索条件 + page 归 1', async () => {
+describe('usePagination reload', () => {
+  it('reload() 提交表单条件 + page 归 1', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword: string }) => {
@@ -74,7 +74,7 @@ describe('usePagination search', () => {
     }
 
     const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
-    const [{ page, search }] = withSetup(() =>
+    const [{ page, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         params: searchParams,
@@ -85,13 +85,13 @@ describe('usePagination search', () => {
     expect(capturedParams).toEqual({ keyword: '', page: 1, pageSize: 10 })
 
     searchParams.value.keyword = 'abc'
-    search()
+    reload()
     await asyncAwait(100)
     expect(capturedParams).toEqual({ keyword: 'abc', page: 1, pageSize: 10 })
     expect(page.value).toBe(1)
   })
 
-  it('search(params) 先写入表单再提交', async () => {
+  it('reload(params) 先写入表单再提交', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword: string }) => {
@@ -100,7 +100,7 @@ describe('usePagination search', () => {
     }
 
     const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
-    const [{ search }] = withSetup(() =>
+    const [{ reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         params: searchParams,
@@ -109,13 +109,13 @@ describe('usePagination search', () => {
 
     await asyncAwait(100)
 
-    search({ keyword: 'xyz' } as any)
+    reload({ keyword: 'xyz' } as any)
     await asyncAwait(100)
     expect(capturedParams).toEqual({ keyword: 'xyz', page: 1, pageSize: 10 })
     expect(searchParams.value.keyword).toBe('xyz')
   })
 
-  it('search() 时 page 非 1 会归 1', async () => {
+  it('reload() 时 page 非 1 会归 1', async () => {
     let capturedParams: any = {}
 
     const service = async (params: { page: number, pageSize: number, keyword: string }) => {
@@ -124,7 +124,7 @@ describe('usePagination search', () => {
     }
 
     const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
-    const [{ page, search }] = withSetup(() =>
+    const [{ page, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 100 }),
         params: searchParams,
@@ -137,7 +137,7 @@ describe('usePagination search', () => {
     await asyncAwait(100)
     expect(capturedParams.page).toBe(3)
 
-    search()
+    reload()
     await asyncAwait(100)
     expect(capturedParams.page).toBe(1)
     expect(page.value).toBe(1)
@@ -152,7 +152,7 @@ describe('usePagination search', () => {
     }
 
     const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
-    const [{ page, search }] = withSetup(() =>
+    const [{ page, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 100 }),
         params: searchParams,
@@ -162,11 +162,11 @@ describe('usePagination search', () => {
     await asyncAwait(100)
 
     searchParams.value.keyword = 'abc'
-    search()
+    reload()
     await asyncAwait(100)
     expect(capturedParams).toEqual({ keyword: 'abc', page: 1, pageSize: 10 })
 
-    // 表单改为 'xyz' 但不搜索，直接翻页
+    // 表单改为 'xyz' 但不 reload，直接翻页
     searchParams.value.keyword = 'xyz'
     page.value = 2
     await asyncAwait(100)
@@ -265,7 +265,7 @@ describe('usePagination manual', () => {
       return { records: [], totalCount: 0 }
     }
 
-    const [{ search }] = withSetup(() =>
+    const [{ reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         manual: true,
@@ -275,7 +275,7 @@ describe('usePagination manual', () => {
     await asyncAwait(100)
     expect(callCount).toBe(0)
 
-    search()
+    reload()
     await asyncAwait(100)
     expect(callCount).toBe(1)
   })
@@ -307,8 +307,8 @@ describe('usePagination watchSource', () => {
   })
 })
 
-describe('usePagination search 返回值', () => {
-  it('searchAsync() 返回 promise 数据，可以 await 拿到结果', async () => {
+describe('usePagination reload 返回值', () => {
+  it('reloadAsync() 返回 promise 数据，可以 await 拿到结果', async () => {
     let callCount = 0
 
     const service = async () => {
@@ -317,7 +317,7 @@ describe('usePagination search 返回值', () => {
       return { records: [{ id: 1, name: 'User 1' }], totalCount: 1 }
     }
 
-    const [{ searchAsync, list }] = withSetup(() =>
+    const [{ reloadAsync, list }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: (data: any) => ({ list: data.records, total: data.totalCount }),
       }),
@@ -326,13 +326,13 @@ describe('usePagination search 返回值', () => {
     await asyncAwait(100)
     expect(callCount).toBe(1)
 
-    const result = await searchAsync()
+    const result = await reloadAsync()
     expect(callCount).toBe(2)
     expect(result).toEqual({ list: [{ id: 1, name: 'User 1' }], total: 1 })
     expect(list.value).toHaveLength(1)
   })
 
-  it('search() 不会导致双发请求', async () => {
+  it('reload() 不会导致双发请求', async () => {
     let callCount = 0
 
     const service = async (_params: { page: number, pageSize: number, keyword: string }) => {
@@ -342,7 +342,7 @@ describe('usePagination search 返回值', () => {
     }
 
     const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
-    const [{ page, search }] = withSetup(() =>
+    const [{ page, reload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 100 }),
         params: searchParams,
@@ -352,15 +352,15 @@ describe('usePagination search 返回值', () => {
     await asyncAwait(100)
     expect(callCount).toBe(1)
 
-    // page 非 1 时 search，应该只发一次请求
+    // page 非 1 时 reload，应该只发一次请求
     page.value = 3
     await asyncAwait(100)
     expect(callCount).toBe(2)
 
     searchParams.value.keyword = 'abc'
-    await search()
+    await reload()
     await asyncAwait(100)
-    // search 内部 doRequest + watch 被 suppress，总共只多一次
+    // reload 内部 doRequest + watch 被 suppress，总共只多一次
     expect(callCount).toBe(3)
   })
 })
@@ -419,8 +419,8 @@ describe('usePagination optimisticUpdate', () => {
   })
 })
 
-describe('usePagination debounceSearch', () => {
-  it('debounceSearch 防抖后只发一次请求', async () => {
+describe('usePagination debounceReload', () => {
+  it('debounceReload 防抖后只发一次请求', async () => {
     let callCount = 0
 
     const service = async () => {
@@ -430,7 +430,7 @@ describe('usePagination debounceSearch', () => {
     }
 
     const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
-    const [{ debounceSearch }] = withSetup(() =>
+    const [{ debounceReload }] = withSetup(() =>
       usePagination(service, {
         dataSerializer: () => ({ list: [], total: 0 }),
         params: searchParams,
@@ -443,11 +443,11 @@ describe('usePagination debounceSearch', () => {
 
     // 快速连续调用
     searchParams.value.keyword = 'a'
-    debounceSearch()
+    debounceReload()
     searchParams.value.keyword = 'ab'
-    debounceSearch()
+    debounceReload()
     searchParams.value.keyword = 'abc'
-    debounceSearch()
+    debounceReload()
 
     // 防抖等待时间内不应发请求
     await asyncAwait(50)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { defineComponent, h, ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -30,13 +30,10 @@ const TodoListComp = defineComponent(() => {
   })
   return () => {
     if (!data.value) return h('span', '加载中...')
-    return h('ul', { style: 'margin:0;padding-left:20px' },
-      (data.value as Todo[]).map(todo =>
-        h('li', { style: `margin-bottom:4px;${todo.completed ? 'text-decoration:line-through;color:#999' : ''}` },
-          todo.title
-        )
-      )
-    )
+    return h('ul', { style: 'margin:0;padding-left:20px' }, (data.value as Todo[]).map(todo =>
+      h('li', { style: `margin-bottom:4px;${todo.completed ? 'text-decoration:line-through;color:#999' : ''}` }, todo.title,
+      ),
+    ))
   }
 })
 </script>

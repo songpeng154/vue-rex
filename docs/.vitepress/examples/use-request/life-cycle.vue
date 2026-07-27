@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -60,8 +60,12 @@ const { data, error, loading, run } = useApi(getOrder, {
     </div>
     <div class="log-box">
       <h4>生命周期日志</h4>
-      <div v-if="log.length === 0" class="empty">暂无日志，点击上方按钮触发请求。</div>
-      <div v-for="(entry, index) in log" :key="index" class="log-entry">{{ entry }}</div>
+      <div v-if="log.length === 0" class="empty">
+        暂无日志，点击上方按钮触发请求。
+      </div>
+      <div v-for="(entry, index) in log" :key="index" class="log-entry">
+        {{ entry }}
+      </div>
     </div>
   </div>
 </template>

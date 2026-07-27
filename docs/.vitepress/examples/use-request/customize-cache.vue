@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { defineComponent, h, ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 

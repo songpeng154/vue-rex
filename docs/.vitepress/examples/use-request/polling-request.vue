@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -23,15 +23,23 @@ const { data, loading, run } = useApi(checkStatus, {
 
 <template>
   <div>
-    <p class="desc">轮询常用于实时获取最新状态（如任务进度、订单状态等）</p>
-    <div v-if="data" class="box ok">{{ data }}</div>
+    <p class="desc">
+      轮询常用于实时获取最新状态（如任务进度、订单状态等）
+    </p>
+    <div v-if="data" class="box ok">
+      {{ data }}
+    </div>
     <div class="info">
       <span>轮询次数：{{ pollingCount }}</span>
       <span v-if="loading">⏳ 请求中...</span>
     </div>
     <div class="actions">
-      <button v-if="!isActive" @click="isActive = true; run()">开始轮询</button>
-      <button v-else class="stop" @click="isActive = false">停止轮询</button>
+      <button v-if="!isActive" @click="isActive = true; run()">
+        开始轮询
+      </button>
+      <button v-else class="stop" @click="isActive = false">
+        停止轮询
+      </button>
     </div>
   </div>
 </template>

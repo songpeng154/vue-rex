@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { reactive } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -44,9 +44,13 @@ run('svelte')
       <div v-for="(items, key) in list" :key="key" class="col">
         <h3>{{ key }}</h3>
         <ul v-if="items.length">
-          <li v-for="item in items" :key="item">{{ item }}</li>
+          <li v-for="item in items" :key="item">
+            {{ item }}
+          </li>
         </ul>
-        <p v-else class="empty">加载中...</p>
+        <p v-else class="empty">
+          加载中...
+        </p>
       </div>
     </div>
   </div>

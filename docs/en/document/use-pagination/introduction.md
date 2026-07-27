@@ -17,10 +17,10 @@ const usePage = createPagination({
   totalKey: 'data.total',
 })
 
-interface User { id: number; name: string }
+interface User { id: number, name: string }
 
-const getUsers = (params: { page: number; pageSize: number }) =>
-  server.get<{ data: { list: User[]; total: number } }>('/api/users', { params })
+const getUsers = (params: { page: number, pageSize: number }) =>
+  server.get<{ data: { list: User[], total: number } }>('/api/users', { params })
 
 const { list, total, page, pageSize, totalPage, isLastPage } = usePage(getUsers)
 ```
@@ -43,7 +43,7 @@ const usePage = createPagination({
 })
 
 // service receives current / size instead of page / pageSize
-const getUsers = (params: { current: number; size: number }) =>
+const getUsers = (params: { current: number, size: number }) =>
   server.get('/api/users', { params })
 ```
 
@@ -51,25 +51,25 @@ const getUsers = (params: { current: number; size: number }) =>
 use-pagination/pagination-fields
 :::
 
-## Search + Pagination
+## Filter / Reload + Pagination
 
-Pass a `params` ref as the form model. `search()` commits search conditions and resets to page 1:
+Pass a `params` ref as the form model. `reload()` commits conditions and resets to page 1:
 
 ```typescript
 const searchParams = ref({ page: 1, pageSize: 10, keyword: '' })
 
-const { list, page, search } = usePage(getUsers, {
+const { list, page, reload } = usePage(getUsers, {
   params: searchParams,
 })
 
-// Search: commit current form values + page → 1 + request
-const onSearch = () => search()
+// Reload: commit current form values + page → 1 + request
+const onReload = () => reload()
 
 // Or pass explicit params (writes to form ref then commits)
-search({ keyword: 'abc' })
+reload({ keyword: 'abc' })
 ```
 
-Pagination uses the last committed search conditions — uncommitted form changes don't affect page requests.
+Pagination uses the last committed conditions — uncommitted form changes don't affect page requests.
 
 ::: demo
 use-pagination/search-with-pagination
@@ -81,7 +81,7 @@ Transform list items (rename fields, format values, etc.) while `total` stays un
 
 ```typescript
 const { list } = usePage(getUsers, {
-  formatList: (list) =>
+  formatList: list =>
     list.map(item => ({
       ...item,
       fullName: `${item.lastName}${item.firstName}`,
@@ -127,7 +127,7 @@ Extends [createRequest return value](../use-request/introduction.md#return-value
 | `pageSize` | `Ref<number>` | Page size (writable, proxied to params ref) |
 | `totalPage` | `ComputedRef<number>` | Total pages |
 | `isLastPage` | `ComputedRef<boolean>` | Whether last page |
-| `search` | `(params?: TParams) => Promise` | Commit search conditions + page → 1 + request |
-| `debounceSearch` | `DebouncedFunction` | Debounced search |
-| `throttleSearch` | `DebouncedFunction` | Throttled search |
+| `reload` | `(params?: TParams) => Promise` | Commit conditions + page → 1 + request |
+| `debounceReload` | `DebouncedFunction` | Debounced reload |
+| `throttleReload` | `DebouncedFunction` | Throttled reload |
 | `refresh` | `() => Promise` | Re-request with current params |

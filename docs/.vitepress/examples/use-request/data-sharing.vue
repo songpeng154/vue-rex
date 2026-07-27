@@ -47,21 +47,29 @@ const {
     <div class="row">
       <div class="col">
         <h4>组件 A</h4>
-        <div v-if="loadingA" class="state-box loading">加载中...</div>
+        <div v-if="loadingA" class="state-box loading">
+          加载中...
+        </div>
         <div v-else-if="dataA" class="state-box success">
           <p>站点：{{ dataA.siteName }}</p>
           <p>版本：{{ dataA.version }}</p>
         </div>
-        <button :disabled="loadingA" @click="runA()">刷新 A</button>
+        <button :disabled="loadingA" @click="runA()">
+          刷新 A
+        </button>
       </div>
       <div class="col">
         <h4>组件 B</h4>
-        <div v-if="loadingB" class="state-box loading">加载中...</div>
+        <div v-if="loadingB" class="state-box loading">
+          加载中...
+        </div>
         <div v-else-if="dataB" class="state-box success">
           <p>站点：{{ dataB.siteName }}</p>
           <p>版本：{{ dataB.version }}</p>
         </div>
-        <button :disabled="loadingB" @click="runB()">刷新 B</button>
+        <button :disabled="loadingB" @click="runB()">
+          刷新 B
+        </button>
       </div>
     </div>
   </div>

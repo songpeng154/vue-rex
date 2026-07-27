@@ -69,7 +69,7 @@ function usePage<
 >(
   service: RequestServiceFn<TData, [TParams]>,
   options?: PaginationOptions<TData, TParams, TItem, TFormatData>,
-): PaginationResult<TData, TParams, TItem, TFormatData>;
+): PaginationResult<TData, TParams, TItem, TFormatData>
 ```
 
 ## 使用示例
@@ -85,13 +85,13 @@ const usePage = createPagination({
 
 const searchParams = ref({ keyword: '', page: 1, pageSize: 10 })
 
-const { list, total, page, pageSize, loading, search } = usePage(
-  (params) => fetch('/api/list', params),
+const { list, total, page, pageSize, loading, reload } = usePage(
+  params => fetch('/api/list', params),
   { params: searchParams },
 )
 
-// 搜索
-search()
+// 重新加载列表（重置到第1页）
+reload()
 
 // 翻页
 page.value = 2

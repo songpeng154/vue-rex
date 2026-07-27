@@ -25,8 +25,8 @@ export type RequestResult<
   TSerialized = TData,
   // 格式化数据
   TFormatData = TSerialized,
-> = WrapWithComputed<RequestState<TData, TParams, TSerialized, TFormatData>> &
-  RequestMethod<TData, TParams, TSerialized, TFormatData>
+> = WrapWithComputed<RequestState<TData, TParams, TSerialized, TFormatData>>
+  & RequestMethod<TData, TParams, TSerialized, TFormatData>
 ```
 
 ## 泛型

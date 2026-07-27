@@ -44,8 +44,8 @@ use-request/loading-keep
 
 ```typescript
 const { loading } = useApi(service, {
-  loadingDelay: 200,  // 200ms 内完成的请求不显示 loading
-  loadingKeep: 500,   // loading 至少显示 500ms
+  loadingDelay: 200, // 200ms 内完成的请求不显示 loading
+  loadingKeep: 500, // loading 至少显示 500ms
 })
 ```
 

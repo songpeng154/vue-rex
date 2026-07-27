@@ -15,7 +15,7 @@ interface User {
 }
 
 // 2. service 接收 { page, pageSize }，返回后端响应格式
-const getUsers = async (params: { page: number; pageSize: number }) => {
+const getUsers = async (params: { page: number, pageSize: number }) => {
   await new Promise(resolve => setTimeout(resolve, 1000))
   const total = 50
   const list: User[] = Array.from({ length: params.pageSize }, (_, i) => {
@@ -46,21 +46,35 @@ const { list, loading, page, pageSize, total, totalPage } = usePage(getUsers)
         </tr>
       </tbody>
     </table>
-    <div v-if="loading" class="loading-row">⏳ 加载中...</div>
+    <div v-if="loading" class="loading-row">
+      ⏳ 加载中...
+    </div>
 
     <div class="pager">
       <span>第 {{ page }} / {{ totalPage }} 页，共 {{ total }} 条</span>
       <div class="btns">
-        <button :disabled="page === 1" @click="page--">上一页</button>
-        <button :disabled="page >= totalPage" @click="page++">下一页</button>
+        <button :disabled="page === 1" @click="page--">
+          上一页
+        </button>
+        <button :disabled="page >= totalPage" @click="page++">
+          下一页
+        </button>
         <select :value="pageSize" @change="pageSize = Number(($event.target as HTMLSelectElement).value)">
-          <option :value="5">5条/页</option>
-          <option :value="10">10条/页</option>
-          <option :value="20">20条/页</option>
+          <option :value="5">
+            5条/页
+          </option>
+          <option :value="10">
+            10条/页
+          </option>
+          <option :value="20">
+            20条/页
+          </option>
         </select>
       </div>
     </div>
-    <p class="hint">修改 page / pageSize 会自动触发请求，无需手动处理</p>
+    <p class="hint">
+      修改 page / pageSize 会自动触发请求，无需手动处理
+    </p>
   </div>
 </template>
 

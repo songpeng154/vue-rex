@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { computed } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -56,17 +56,27 @@ const { data: orders, loading: loadingOrders } = useApi(() => getUserOrders(user
     <div class="row">
       <div class="col">
         <h4>请求 A：用户列表</h4>
-        <div v-if="loadingUsers" class="state-box loading">加载用户中...</div>
+        <div v-if="loadingUsers" class="state-box loading">
+          加载用户中...
+        </div>
         <div v-else-if="users" class="state-box success">
-          <p v-for="u in users" :key="u.id">{{ u.name }}（ID: {{ u.id }}）</p>
+          <p v-for="u in users" :key="u.id">
+            {{ u.name }}（ID: {{ u.id }}）
+          </p>
         </div>
       </div>
       <div class="col">
         <h4>请求 B：订单（依赖 A）</h4>
-        <div v-if="!ready" class="state-box loading">等待用户数据就绪...</div>
-        <div v-else-if="loadingOrders" class="state-box loading">加载订单中...</div>
+        <div v-if="!ready" class="state-box loading">
+          等待用户数据就绪...
+        </div>
+        <div v-else-if="loadingOrders" class="state-box loading">
+          加载订单中...
+        </div>
         <div v-else-if="orders" class="state-box success">
-          <p v-for="o in orders" :key="o.orderId">{{ o.product }} - ￥{{ o.amount }}</p>
+          <p v-for="o in orders" :key="o.orderId">
+            {{ o.product }} - ￥{{ o.amount }}
+          </p>
         </div>
       </div>
     </div>

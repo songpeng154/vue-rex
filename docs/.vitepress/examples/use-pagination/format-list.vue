@@ -19,7 +19,7 @@ interface FormattedUser {
   createdAt: string
 }
 
-const getUsers = async (params: { page: number; pageSize: number }) => {
+const getUsers = async (params: { page: number, pageSize: number }) => {
   await new Promise(resolve => setTimeout(resolve, 600))
   const total = 20
   const list: RawUser[] = Array.from({ length: params.pageSize }, (_, i) => {
@@ -60,16 +60,24 @@ const { list, loading, page, totalPage, total } = usePage(getUsers, {
         </tr>
       </tbody>
     </table>
-    <div v-if="loading" class="loading-row">⏳ 加载中...</div>
+    <div v-if="loading" class="loading-row">
+      ⏳ 加载中...
+    </div>
 
     <div class="pager">
       <span>第 {{ page }} / {{ totalPage }} 页，共 {{ total }} 条</span>
       <div class="btns">
-        <button :disabled="page === 1" @click="page--">上一页</button>
-        <button :disabled="page >= totalPage" @click="page++">下一页</button>
+        <button :disabled="page === 1" @click="page--">
+          上一页
+        </button>
+        <button :disabled="page >= totalPage" @click="page++">
+          下一页
+        </button>
       </div>
     </div>
-    <p class="hint">formatList 将 first_name + last_name 合并为 fullName，日期格式化，total 保持原始值</p>
+    <p class="hint">
+      formatList 将 first_name + last_name 合并为 fullName，日期格式化，total 保持原始值
+    </p>
   </div>
 </template>
 

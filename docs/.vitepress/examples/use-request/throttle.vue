@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -28,8 +28,12 @@ const handleClick = () => {
 
 <template>
   <div>
-    <p class="desc">快速连续点击按钮，2 秒内只会发出 1 次请求（用于防止重复提交）</p>
-    <button class="btn" @click="handleClick">提交表单</button>
+    <p class="desc">
+      快速连续点击按钮，2 秒内只会发出 1 次请求（用于防止重复提交）
+    </p>
+    <button class="btn" @click="handleClick">
+      提交表单
+    </button>
     <div class="stats">
       <span>点击次数：<strong>{{ clickCount }}</strong></span>
       <span>实际请求次数：<strong>{{ requestCount }}</strong></span>

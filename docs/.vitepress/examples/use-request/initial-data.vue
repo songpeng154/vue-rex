@@ -33,11 +33,19 @@ const { data, loading } = useApi(() => getProfile(1), {
       initialData 提供初始占位数据。在请求完成前，页面不会显示空白或报错，用户体验更流畅。
     </p>
     <div class="state-box" :class="loading ? 'loading' : 'success'">
-      <div class="avatar">{{ data!.name.charAt(0) }}</div>
+      <div class="avatar">
+        {{ data!.name.charAt(0) }}
+      </div>
       <div class="info">
-        <p class="name">{{ data!.name }}</p>
-        <p class="meta">{{ data!.role }} | {{ data!.department }}</p>
-        <p v-if="loading" class="hint">正在加载真实数据...</p>
+        <p class="name">
+          {{ data!.name }}
+        </p>
+        <p class="meta">
+          {{ data!.role }} | {{ data!.department }}
+        </p>
+        <p v-if="loading" class="hint">
+          正在加载真实数据...
+        </p>
       </div>
     </div>
   </div>

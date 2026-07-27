@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -25,13 +25,17 @@ const { data, debounceRun } = useApi(searchUsers, {
 
 <template>
   <div>
-    <p class="desc">输入内容后停止 300ms 才真正发起请求，避免每次按键都请求</p>
+    <p class="desc">
+      输入内容后停止 300ms 才真正发起请求，避免每次按键都请求
+    </p>
     <input
       v-model="keyword"
       placeholder="输入姓名，停止输入后自动搜索"
       @input="debounceRun(keyword)"
     >
-    <p class="hint">可查询：张三、李四、王五、张伟、李娜</p>
+    <p class="hint">
+      可查询：张三、李四、王五、张伟、李娜
+    </p>
     <div class="info">
       <span>实际请求次数：<strong>{{ requestCount }}</strong></span>
       <span v-if="data">结果：{{ data.join('、') }}</span>

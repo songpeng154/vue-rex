@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -46,19 +46,27 @@ const removeTodo = (id: number) => {
 
 <template>
   <div>
-    <div v-if="!data" class="loading">⏳ 加载中...</div>
+    <div v-if="!data" class="loading">
+      ⏳ 加载中...
+    </div>
     <div v-else>
       <div class="add-bar">
         <input v-model="newTodo" placeholder="新增待办" @keyup.enter="addTodo">
-        <button @click="addTodo">添加</button>
+        <button @click="addTodo">
+          添加
+        </button>
       </div>
       <ul>
         <li v-for="item in data" :key="item.id" :class="{ done: item.done }">
-          <span @click="toggleDone(item.id)" class="text">{{ item.text }}</span>
-          <button class="del" @click="removeTodo(item.id)">删除</button>
+          <span class="text" @click="toggleDone(item.id)">{{ item.text }}</span>
+          <button class="del" @click="removeTodo(item.id)">
+            删除
+          </button>
         </li>
       </ul>
-      <p class="hint">以上操作通过 mutate 直接修改本地数据，无需重新请求接口</p>
+      <p class="hint">
+        以上操作通过 mutate 直接修改本地数据，无需重新请求接口
+      </p>
     </div>
   </div>
 </template>

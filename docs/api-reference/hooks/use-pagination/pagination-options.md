@@ -87,7 +87,7 @@ export interface PaginationOptions<
 
 * `可选` - `Ref<TParams>`
 
-表单参数 ref，包含搜索字段和分页字段（page / pageSize）。hook 会在此 ref 上建立 page / pageSize 的 computed 代理。搜索字段通过 `search()` 提交后才会用于请求。不传时 hook 内部自建，仅含 page / pageSize。
+表单参数 ref，包含搜索字段和分页字段（page / pageSize）。hook 会在此 ref 上建立 page / pageSize 的 computed 代理。筛选字段通过 `reload()` 提交后才会用于请求。不传时 hook 内部自建，仅含 page / pageSize。
 
 ### initialPage
 

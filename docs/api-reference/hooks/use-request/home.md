@@ -62,7 +62,7 @@ function useApi<
   service: RequestServiceFn<TData, TParams>,
   options?: RequestOptions<TData, TParams, TSerialized, TFormatData>,
   plugins?: RequestPluginImplement<TData, TParams, TSerialized, TFormatData>[]
-): RequestResult<TData, TParams, TSerialized, TFormatData>;
+): RequestResult<TData, TParams, TSerialized, TFormatData>
 ```
 
 ## 使用示例
@@ -73,7 +73,7 @@ import { createRequest } from 'norm-fetch/vue-rex'
 const useApi = createRequest()
 
 const { data, loading, run } = useApi(
-  (params) => fetch('/api/user', params),
+  params => fetch('/api/user', params),
   { manual: true }
 )
 ```

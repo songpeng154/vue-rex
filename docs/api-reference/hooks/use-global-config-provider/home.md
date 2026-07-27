@@ -8,8 +8,6 @@ outline: deep
 实现的[useRequest](../use-request/home.md)、[useFetch插件](../use-request/request-plugin-implement)、[usePagination](../use-pagination/home.md)
 全局配置功能。
 
-
-
 ## 类型声明
 
 ```typescript
@@ -18,7 +16,7 @@ function useGlobalConfigProvider<
   TParams extends any[] = any[],
   TFormatData = TData,
   TRawData = any
->(config: GlobalConfigProvider<TData, TParams, TFormatData, TRawData>): void;
+>(config: GlobalConfigProvider<TData, TParams, TFormatData, TRawData>): void
 ```
 
 ## 相关类型

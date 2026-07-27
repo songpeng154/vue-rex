@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -22,7 +22,9 @@ const { data, loading } = useApi(() => getLibs(type.value), {
 
 <template>
   <div>
-    <p class="desc">切换选项时自动刷新数据，无需手动调用 run</p>
+    <p class="desc">
+      切换选项时自动刷新数据，无需手动调用 run
+    </p>
     <div class="tabs">
       <label :class="type === 0 ? 'active' : ''">
         <input v-model="type" :value="0" type="radio"> Vue 生态
@@ -31,9 +33,13 @@ const { data, loading } = useApi(() => getLibs(type.value), {
         <input v-model="type" :value="1" type="radio"> React 生态
       </label>
     </div>
-    <div v-if="loading" class="box loading">⏳ 加载中...</div>
+    <div v-if="loading" class="box loading">
+      ⏳ 加载中...
+    </div>
     <ul v-else-if="data">
-      <li v-for="item in data" :key="item">{{ item }}</li>
+      <li v-for="item in data" :key="item">
+        {{ item }}
+      </li>
     </ul>
   </div>
 </template>

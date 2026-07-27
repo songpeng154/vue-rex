@@ -1,8 +1,8 @@
+import type { ApiResponse, ListResult, UserInfo } from './helpers.ts'
 import { describe, expect, it } from 'vitest'
 import { ref } from 'vue'
 import { useRequest } from '../../src/hooks'
 import { asyncAwait, withSetup } from '../utils.ts'
-import { ApiResponse, UserInfo, ListResult } from './helpers.ts'
 
 describe('useRequest formatData', () => {
   it('formatData 对 service 返回值做二次处理', async () => {

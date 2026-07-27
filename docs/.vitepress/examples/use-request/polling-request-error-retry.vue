@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createRequest } from 'vue-rex'
 import { ref } from 'vue'
+import { createRequest } from 'vue-rex'
 
 const useApi = createRequest({ dataKey: 'data' })
 
@@ -13,8 +13,8 @@ const getUnstableStatus = async (): Promise<{ data: string }> => {
 const retryCount = ref(0)
 
 const { error, loading } = useApi(getUnstableStatus, {
-  pollingInterval: 1500,          // 每 1.5 秒轮询一次
-  pollingErrorRetryCount: 3,     // 失败后最多重试 3 次
+  pollingInterval: 1500, // 每 1.5 秒轮询一次
+  pollingErrorRetryCount: 3, // 失败后最多重试 3 次
   onError() {
     retryCount.value += 1
   },
@@ -27,14 +27,22 @@ const { error, loading } = useApi(getUnstableStatus, {
       pollingInterval + pollingErrorRetryCount：请求失败后自动重试，重试达到上限后停止轮询，避免无效请求浪费资源。
     </p>
     <div class="state-box" :class="loading ? 'loading' : 'error'">
-      <div class="status-icon">{{ loading ? '...' : '!' }}</div>
+      <div class="status-icon">
+        {{ loading ? '...' : '!' }}
+      </div>
       <div class="status-info">
-        <p class="status-title">{{ loading ? '正在轮询...' : '轮询已停止' }}</p>
-        <p class="status-desc" v-if="error">{{ error.msg }}（错误码：{{ error.code }}）</p>
+        <p class="status-title">
+          {{ loading ? '正在轮询...' : '轮询已停止' }}
+        </p>
+        <p v-if="error" class="status-desc">
+          {{ error.msg }}（错误码：{{ error.code }}）
+        </p>
         <p class="status-detail">
           已重试次数：<strong>{{ retryCount }}</strong> / 3
         </p>
-        <p v-if="!loading" class="status-hint">已达到最大重试次数，停止自动轮询。</p>
+        <p v-if="!loading" class="status-hint">
+          已达到最大重试次数，停止自动轮询。
+        </p>
       </div>
     </div>
   </div>

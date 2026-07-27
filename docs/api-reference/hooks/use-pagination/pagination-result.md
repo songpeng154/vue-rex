@@ -51,17 +51,17 @@ export interface PaginationResult<
   /** 是否已是最后一页 */
   isLastPage: ComputedRef<boolean>
 
-  /** 搜索（静默模式）：提交搜索条件 + page 归 1 + 触发请求 */
-  search: (params?: TParams) => Promise<void>
+  /** 重新加载（静默模式）：提交参数 + page 归 1 + 触发请求 */
+  reload: (params?: TParams) => Promise<void>
 
-  /** 搜索（Promise 模式）：提交搜索条件 + page 归 1 + 触发请求，失败抛出异常 */
-  searchAsync: (params?: TParams) => Promise<PaginationData<TFormatData>>
+  /** 重新加载（Promise 模式）：提交参数 + page 归 1 + 触发请求，失败抛出异常 */
+  reloadAsync: (params?: TParams) => Promise<PaginationData<TFormatData>>
 
-  /** 防抖版 search */
-  debounceSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
+  /** 防抖版 reload */
+  debounceReload: DebouncedFunction<(params?: TParams) => Promise<void>>
 
-  /** 节流版 search */
-  throttleSearch: DebouncedFunction<(params?: TParams) => Promise<void>>
+  /** 节流版 reload */
+  throttleReload: DebouncedFunction<(params?: TParams) => Promise<void>>
 
   /** 使用当前参数重新请求（静默模式） */
   refresh: () => Promise<void>
@@ -92,7 +92,7 @@ export interface PaginationResult<
 
 * `必填` - `ComputedRef<TParams>`
 
-当前请求参数（已提交的搜索字段 + 当前 page / pageSize）
+当前请求参数（已提交的筛选字段 + 当前 page / pageSize）
 
 ### list
 
@@ -132,43 +132,43 @@ export interface PaginationResult<
 
 ## 方法
 
-### search
+### reload
 
-提交搜索条件 + page 归 1 + 触发请求（静默模式）。无参时提交 params ref 中的当前表单值；传参时先写入 params ref 再提交。
+提交参数 + page 归 1 + 触发请求（静默模式）。无参时提交 params ref 中的当前表单值；传参时先写入 params ref 再提交。
 内部捕获异常，不会抛出 Promise 错误。
 
 #### 入参
 
 | 名称       | 类型        | 默认值 | 描述   |
 |:---------|:----------|:----|:-----|
-| `params` | `TParams` | 可选 | 搜索参数，写入表单 ref 后提交 |
+| `params` | `TParams` | 可选 | 筛选参数，写入表单 ref 后提交 |
 
 #### 返回值
 
 `Promise<void>`
 
-### searchAsync
+### reloadAsync
 
-提交搜索条件 + page 归 1 + 触发请求（Promise 模式）。
+提交参数 + page 归 1 + 触发请求（Promise 模式）。
 失败时抛出异常，可使用 `try...catch` 进行捕获并获取处理后的分页结果。
 
 #### 入参
 
 | 名称       | 类型        | 默认值 | 描述   |
 |:---------|:----------|:----|:-----|
-| `params` | `TParams` | 可选 | 搜索参数，写入表单 ref 后提交 |
+| `params` | `TParams` | 可选 | 筛选参数，写入表单 ref 后提交 |
 
 #### 返回值
 
 `Promise<PaginationData<TFormatData>>`
 
-### debounceSearch
+### debounceReload
 
-与 [search](#search) 用法一致，带防抖
+与 [reload](#reload) 用法一致，带防抖
 
-### throttleSearch
+### throttleReload
 
-与 [search](#search) 用法一致，带节流
+与 [reload](#reload) 用法一致，带节流
 
 ### refresh
 
